@@ -2,7 +2,6 @@ import { Container } from "pixi.js";
 import { PixiApplicationBase } from "../lib/PixiApplicationBase";
 import { createHexGraphic, createWorldGraphics } from "./HexGraphics";
 import { Vec2 } from "../lib/Vec2";
-import { pixelToHex } from "../lib/hex/HexCoordinatesConversion";
 import { World } from "./World";
 import { createArea } from "../lib/hex/HexCoordinatesFactory";
 import { Hex } from "./Hex";
@@ -15,12 +14,14 @@ const fields = createArea(3).map(
   (coord): Hex => ({
     position: coord,
     color: 0x00c040,
+    food: 0,
   }),
 );
 const world = new World(fields);
 const city: Hex = {
   position: HexCoordinate.ZERO,
   color: 0x808080,
+  food: 25,
 };
 world.update(city);
 
@@ -35,17 +36,17 @@ export class LoW extends PixiApplicationBase {
   constructor(canvas: HTMLCanvasElement) {
     super(canvas, { backgroundColor: "#ffffff", antialias: true });
     this.init();
-
-    this.map.eventMode = "static";
-    this.map.addEventListener("click", (e) => {
-      const p = e.getLocalPosition(this.map);
-      console.log(pixelToHex(new Vec2(p), SCALE));
-    });
   }
 
   protected start(): void {
-    for (const hex of this.worldGraphics.values()) {
-      this.map.addChild(hex);
+    for (const hex of world.getHexes()) {
+      const hexGraphic =
+        this.worldGraphics.get(hex.position.toString()) ?? throwError();
+      hexGraphic.eventMode = "static";
+      hexGraphic.addEventListener("click", () => {
+        console.log(hex);
+      });
+      this.map.addChild(hexGraphic);
     }
     this.map.scale.set(0.5);
     this.app.stage.addChild(this.map);
@@ -64,4 +65,8 @@ export class LoW extends PixiApplicationBase {
   protected resize(): void {
     this.map.position.set(this.canvas.width / 2, this.canvas.height / 2);
   }
+}
+
+function throwError(msg?: string): never {
+  throw new Error(msg);
 }
