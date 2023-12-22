@@ -3,7 +3,10 @@ import { PixiApplicationBase } from "../lib/PixiApplicationBase";
 import { createHex } from "./HexGraphics";
 import { Vec2 } from "../lib/Vec2";
 import { pixelToHex, hexToPixel } from "../lib/hex/HexCoordinatesConversion";
-import { world } from "./World";
+import { World } from "./World";
+import { createArea } from "../lib/hex/HexCoordinatesFactory";
+import { Hex } from "./Hex";
+import { HexCoordinate } from "../lib/hex/HexCoordinate";
 
 const SCALE = Vec2.ONE.scale(100);
 const UNIT_HEX = createHex({ radius: SCALE.x, lineWidth: 10 });
@@ -23,7 +26,20 @@ export class LoW extends PixiApplicationBase {
   }
 
   protected start(): void {
-    for (const { position, color } of world.values()) {
+    const fields = createArea(3).map(
+      (coord): Hex => ({
+        position: coord,
+        color: 0x00c040,
+      }),
+    );
+    const world = new World(fields);
+    const city: Hex = {
+      position: HexCoordinate.ZERO,
+      color: 0x808080,
+    };
+    world.update(city);
+
+    for (const { position, color } of world.getHexes()) {
       const p = hexToPixel(position, SCALE);
       const hex = UNIT_HEX.clone();
       hex.tint = color;
