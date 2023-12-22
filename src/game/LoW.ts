@@ -3,7 +3,7 @@ import { PixiApplicationBase } from "../lib/PixiApplicationBase";
 import { createHex } from "./HexGraphics";
 import { Vec2 } from "../lib/Vec2";
 import { WORLD } from "./World";
-import { pixelToHex, hexToPixel } from "../lib/hex/HexTransform";
+import { pixelToHex, hexToPixel } from "../lib/hex/HexCoordinatesConversion";
 
 const SCALE = Vec2.ONE.scale(100);
 const UNIT_HEX = createHex({ radius: SCALE.x, lineWidth: 10 });
