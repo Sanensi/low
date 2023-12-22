@@ -1,5 +1,5 @@
-import { HexCoordinate } from "../lib/HexCoordinate";
-import { createRing } from "../lib/HexCoordinatesFactory";
+import { HexCoordinate } from "../lib/hex/HexCoordinate";
+import { createRing } from "../lib/hex/HexCoordinatesFactory";
 import { Hex } from "./Hex";
 
 const coordinates = [HexCoordinate.ZERO, ...createRing(1)];

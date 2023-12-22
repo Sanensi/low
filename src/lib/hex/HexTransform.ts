@@ -1,5 +1,5 @@
 import { HexCoordinate } from "./HexCoordinate";
-import { Vec2 } from "./Vec2";
+import { Vec2 } from "../Vec2";
 
 const sqrt3 = Math.sqrt(3);
 const hexToPixelMatrix = [3 / 2, 0, sqrt3 / 2, sqrt3];
