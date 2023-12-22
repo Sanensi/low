@@ -1,18 +1,23 @@
-import { Graphics } from "pixi.js";
+import { Container } from "pixi.js";
 import { PixiApplicationBase } from "../lib/PixiApplicationBase";
+import { createHex } from "./HexGraphics";
 
 export class LoW extends PixiApplicationBase {
+  private map = new Container();
+
   constructor(canvas: HTMLCanvasElement) {
-    super(canvas, { backgroundColor: "#ffffff" });
+    super(canvas, { backgroundColor: "#ffffff", antialias: true });
     this.init();
   }
 
   protected start(): void {
-    const g = new Graphics();
-    g.beginFill("#000000");
-    g.drawRect(50, 50, 50, 50);
-    g.endFill();
+    const hex = createHex();
+    this.map.addChild(hex);
+    this.app.stage.addChild(this.map);
+    this.resize();
+  }
 
-    this.app.stage.addChild(g);
+  protected resize(): void {
+    this.map.position.set(this.canvas.width / 2, this.canvas.height / 2);
   }
 }
