@@ -1,8 +1,9 @@
 import { Container } from "pixi.js";
 import { PixiApplicationBase } from "../lib/PixiApplicationBase";
 import { createHex } from "./HexGraphics";
-import { HexCoordinate, hexToPixel, pixelToHex } from "../lib/HexCoordinate";
 import { Vec2 } from "../lib/Vec2";
+import { pixelToHex, hexToPixel } from "../lib/HexTransform";
+import { HexCoordinate } from "../lib/HexCoordinate";
 
 const SCALE = Vec2.ONE.scale(100);
 const UNIT_HEX = createHex({ radius: SCALE.x, lineWidth: 10 });
