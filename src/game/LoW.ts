@@ -2,21 +2,11 @@ import { Container } from "pixi.js";
 import { PixiApplicationBase } from "../lib/PixiApplicationBase";
 import { createHex } from "./HexGraphics";
 import { Vec2 } from "../lib/Vec2";
+import { WORLD } from "./World";
 import { pixelToHex, hexToPixel } from "../lib/HexTransform";
-import { HexCoordinate } from "../lib/HexCoordinate";
 
 const SCALE = Vec2.ONE.scale(100);
 const UNIT_HEX = createHex({ radius: SCALE.x, lineWidth: 10 });
-
-const coordinates = [
-  new HexCoordinate(0, 0, 0),
-  new HexCoordinate(1, -1, 0),
-  new HexCoordinate(1, 0, -1),
-  new HexCoordinate(0, 1, -1),
-  new HexCoordinate(-1, 1, 0),
-  new HexCoordinate(-1, 0, 1),
-  new HexCoordinate(0, -1, 1),
-];
 
 export class LoW extends PixiApplicationBase {
   private map = new Container();
@@ -33,9 +23,10 @@ export class LoW extends PixiApplicationBase {
   }
 
   protected start(): void {
-    for (const coord of coordinates) {
-      const p = hexToPixel(coord, SCALE);
+    for (const { position, color } of WORLD) {
+      const p = hexToPixel(position, SCALE);
       const hex = UNIT_HEX.clone();
+      hex.tint = color;
       hex.position.copyFrom(p);
       this.map.addChild(hex);
     }
