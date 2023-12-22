@@ -1,6 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { Game } from "./app/Game";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>Hello World!</React.StrictMode>,
+  <React.StrictMode>
+    <Game />
+  </React.StrictMode>,
 );
