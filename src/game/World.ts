@@ -1,8 +1,7 @@
-import { HexCoordinate } from "../lib/hex/HexCoordinate";
-import { createRing } from "../lib/hex/HexCoordinatesFactory";
+import { createArea } from "../lib/hex/HexCoordinatesFactory";
 import { Hex } from "./Hex";
 
-const coordinates = [HexCoordinate.ZERO, ...createRing(1)];
+const coordinates = createArea(3);
 
 export const WORLD: Hex[] = coordinates.map(
   (coord): Hex => ({

@@ -1,6 +1,6 @@
 import { HexCoordinate } from "./HexCoordinate";
 
-export function createRing(radius = 1, center = new HexCoordinate(0, 0, 0)) {
+export function createRing(radius = 1, center = HexCoordinate.ZERO) {
   const ring: HexCoordinate[] = [];
 
   let hex = center.add(HexCoordinate.direction("2h").scale(radius));
@@ -21,4 +21,14 @@ export function createRing(radius = 1, center = new HexCoordinate(0, 0, 0)) {
   }
 
   return ring;
+}
+
+export function createArea(radius = 1, center = HexCoordinate.ZERO) {
+  const area = [center];
+
+  for (let currentRadius = 1; currentRadius <= radius; currentRadius++) {
+    area.push(...createRing(currentRadius, center));
+  }
+
+  return area;
 }
