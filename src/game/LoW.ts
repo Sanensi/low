@@ -2,8 +2,8 @@ import { Container } from "pixi.js";
 import { PixiApplicationBase } from "../lib/PixiApplicationBase";
 import { createHex } from "./HexGraphics";
 import { Vec2 } from "../lib/Vec2";
-import { WORLD } from "./World";
 import { pixelToHex, hexToPixel } from "../lib/hex/HexCoordinatesConversion";
+import { world } from "./World";
 
 const SCALE = Vec2.ONE.scale(100);
 const UNIT_HEX = createHex({ radius: SCALE.x, lineWidth: 10 });
@@ -23,7 +23,7 @@ export class LoW extends PixiApplicationBase {
   }
 
   protected start(): void {
-    for (const { position, color } of WORLD) {
+    for (const { position, color } of world.values()) {
       const p = hexToPixel(position, SCALE);
       const hex = UNIT_HEX.clone();
       hex.tint = color;
