@@ -3,26 +3,16 @@ import { PixiApplicationBase } from "../lib/PixiApplicationBase";
 import { createHexGraphic, createWorldGraphics } from "./HexGraphics";
 import { Vec2 } from "../lib/Vec2";
 import { createArea } from "../lib/hex/HexCoordinatesFactory";
-import { Hex } from "./Hex";
+import { Hex, HexCity, HexField } from "./Hex";
 import { HexCoordinate } from "../lib/hex/HexCoordinate";
 import { HexMap } from "../lib/hex/HexMap";
 
 const SCALE = Vec2.ONE.scale(100);
 const HEX_TEMPLATE = createHexGraphic({ radius: SCALE.x, lineWidth: 10 });
 
-const fields = createArea(3).map(
-  (coord): Hex => ({
-    position: coord,
-    color: 0x00c040,
-    food: 0,
-  }),
-);
-const world = new HexMap(fields.map((hex) => [hex.position, hex]));
-const city: Hex = {
-  position: HexCoordinate.ZERO,
-  color: 0x808080,
-  food: 25,
-};
+const fields = createArea(3).map((coord) => new HexField(coord));
+const world = new HexMap<Hex>(fields.map((hex) => [hex.position, hex]));
+const city = new HexCity(HexCoordinate.ZERO);
 world.set(city.position, city);
 
 export class LoW extends PixiApplicationBase {

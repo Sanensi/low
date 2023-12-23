@@ -1,7 +1,19 @@
 import { HexCoordinate } from "../lib/hex/HexCoordinate";
 
-export class Hex {
-  readonly position = new HexCoordinate(0, 0, 0);
+export interface Hex {
+  readonly position: HexCoordinate;
+  readonly color: number;
+}
+
+export class HexField implements Hex {
   readonly color: number = 0x00c040;
-  readonly food: number = 0;
+
+  constructor(readonly position = new HexCoordinate(0, 0, 0)) {}
+}
+
+export class HexCity implements Hex {
+  readonly color: number = 0x808080;
+  readonly food: number = 25;
+
+  constructor(readonly position = new HexCoordinate(0, 0, 0)) {}
 }
