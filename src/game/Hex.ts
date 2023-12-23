@@ -7,6 +7,7 @@ const UNIT_FOOD_COST = 5;
 export abstract class Hex {
   protected _unit?: Unit;
   protected _isSelected = false;
+  readonly isObstacle: boolean = false;
 
   get unit() {
     return this._unit;
@@ -30,6 +31,12 @@ export abstract class Hex {
 }
 
 export class HexField extends Hex {
+  advanceToNextTurn = noop;
+}
+
+export class HexWater extends Hex {
+  readonly isObstacle = true;
+
   advanceToNextTurn = noop;
 }
 

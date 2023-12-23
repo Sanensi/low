@@ -1,6 +1,6 @@
 import { Graphics } from "pixi.js";
 import { Vec2 } from "../../lib/Vec2";
-import { Hex, HexField, HexCity } from "../Hex";
+import { Hex, HexField, HexCity, HexWater } from "../Hex";
 import { getUnitDisplay } from "./UnitDisplay";
 
 export const SCALE = Vec2.ONE.scale(100);
@@ -11,15 +11,17 @@ const VERTICES = Array.from({ length: 6 }, (_, i) =>
 type HexAttributes = {
   fillColor: number;
   strokeColor: number;
+  strokeWidth: number;
   zIndex: number;
 };
 
 export function drawHex(hex: Hex, hexGraphics: Graphics) {
-  const { fillColor, strokeColor, zIndex } = mapHexToAttributes(hex);
+  const { fillColor, strokeColor, strokeWidth, zIndex } =
+    mapHexToAttributes(hex);
 
   hexGraphics.clear();
   hexGraphics.beginFill(fillColor);
-  hexGraphics.lineStyle({ width: 10, color: strokeColor });
+  hexGraphics.lineStyle({ width: strokeWidth, color: strokeColor });
   hexGraphics.moveTo(VERTICES[0].x, VERTICES[0].y);
   for (let i = 0; i < VERTICES.length + 2; i++) {
     const vertice = VERTICES[i % VERTICES.length];
@@ -39,11 +41,18 @@ function mapHexToAttributes(hex: Hex): HexAttributes {
   const attributes: HexAttributes = {
     fillColor: 0xffffff,
     strokeColor: 0x000000,
-    zIndex: 0,
+    strokeWidth: 10,
+    zIndex: 1,
   };
 
   if (hex instanceof HexField) {
     attributes.fillColor = 0x00c040;
+  }
+
+  if (hex instanceof HexWater) {
+    attributes.fillColor = 0x0040c0;
+    attributes.strokeWidth = 0;
+    attributes.zIndex = 0;
   }
 
   if (hex instanceof HexCity) {
@@ -51,8 +60,8 @@ function mapHexToAttributes(hex: Hex): HexAttributes {
   }
 
   if (hex.isSelected) {
-    attributes.strokeColor = 0x0000ff;
-    attributes.zIndex = 1;
+    attributes.strokeColor = 0x0080ff;
+    attributes.zIndex = 2;
   }
 
   return attributes;
