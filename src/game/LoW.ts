@@ -2,10 +2,10 @@ import { Container } from "pixi.js";
 import { PixiApplicationBase } from "../lib/PixiApplicationBase";
 import { createHexGraphic, createWorldGraphics } from "./HexGraphics";
 import { Vec2 } from "../lib/Vec2";
-import { World } from "./World";
 import { createArea } from "../lib/hex/HexCoordinatesFactory";
 import { Hex } from "./Hex";
 import { HexCoordinate } from "../lib/hex/HexCoordinate";
+import { HexMap } from "../lib/hex/HexMap";
 
 const SCALE = Vec2.ONE.scale(100);
 const HEX_TEMPLATE = createHexGraphic({ radius: SCALE.x, lineWidth: 10 });
@@ -17,19 +17,19 @@ const fields = createArea(3).map(
     food: 0,
   }),
 );
-const world = new World(fields);
+const world = new HexMap(fields.map((hex) => [hex.position, hex]));
 const city: Hex = {
   position: HexCoordinate.ZERO,
   color: 0x808080,
   food: 25,
 };
-world.update(city);
+world.set(city.position, city);
 
 export class LoW extends PixiApplicationBase {
   private map = new Container();
   private worldGraphics = createWorldGraphics(
     HEX_TEMPLATE,
-    [...world.getHexes()].map(({ position }) => position),
+    world.keys(),
     SCALE,
   );
 
@@ -39,7 +39,7 @@ export class LoW extends PixiApplicationBase {
   }
 
   protected start(): void {
-    for (const hex of world.getHexes()) {
+    for (const hex of world.values()) {
       const hexGraphic =
         this.worldGraphics.get(hex.position.toString()) ?? throwError();
       hexGraphic.eventMode = "static";
@@ -54,7 +54,7 @@ export class LoW extends PixiApplicationBase {
   }
 
   protected update(): void {
-    for (const hex of world.getHexes()) {
+    for (const hex of world.values()) {
       const hexGraphic = this.worldGraphics.get(hex.position.toString());
       if (hexGraphic) {
         hexGraphic.tint = hex.color;
