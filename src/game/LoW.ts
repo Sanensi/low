@@ -39,12 +39,10 @@ export class LoW extends PixiApplicationBase {
   }
 
   protected start(): void {
-    for (const hex of world.values()) {
-      const hexGraphic =
-        this.worldGraphics.get(hex.position.toString()) ?? throwError();
+    for (const [coord, hexGraphic] of this.worldGraphics.entries()) {
       hexGraphic.eventMode = "static";
       hexGraphic.addEventListener("click", () => {
-        console.log(hex);
+        console.log(world.get(coord));
       });
       this.map.addChild(hexGraphic);
     }
@@ -55,7 +53,7 @@ export class LoW extends PixiApplicationBase {
 
   protected update(): void {
     for (const hex of world.values()) {
-      const hexGraphic = this.worldGraphics.get(hex.position.toString());
+      const hexGraphic = this.worldGraphics.get(hex.position);
       if (hexGraphic) {
         hexGraphic.tint = hex.color;
       }

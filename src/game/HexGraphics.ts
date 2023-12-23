@@ -2,6 +2,7 @@ import { Graphics } from "pixi.js";
 import { Vec2 } from "../lib/Vec2";
 import { HexCoordinate } from "../lib/hex/HexCoordinate";
 import { hexToPixel } from "../lib/hex/HexCoordinatesConversion";
+import { HexMap } from "../lib/hex/HexMap";
 
 type Props = { radius: number; lineWidth: number };
 
@@ -40,12 +41,12 @@ export function createWorldGraphics(
   coordinates: HexCoordinate[],
   scaleFactor: Vec2,
 ) {
-  return new Map(
+  return new HexMap(
     coordinates.map((coord) => {
       const position = hexToPixel(coord, scaleFactor);
       const hex = hexTemplate.clone();
       hex.position.copyFrom(position);
-      return [coord.toString(), hex];
+      return [coord, hex];
     }),
   );
 }
