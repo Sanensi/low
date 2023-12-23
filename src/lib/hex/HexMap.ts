@@ -13,7 +13,9 @@ export class HexMap<T> {
     this.map.set(key.toString(), { key, value });
   }
 
-  get(key: HexCoordinate) {
+  get(key?: HexCoordinate) {
+    if (!key) return undefined;
+
     return this.map.get(key.toString())?.value;
   }
 

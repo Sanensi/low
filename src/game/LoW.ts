@@ -18,6 +18,10 @@ world.set(city.position, city);
 export class LoW extends PixiApplicationBase {
   private world = world;
   private currentTurn = 1;
+  private selectedCoords?: HexCoordinate;
+  private get selectedHex() {
+    return this.world.get(this.selectedCoords);
+  }
 
   private map = new Container();
   private worldGraphics = createWorldGraphics(
@@ -43,6 +47,7 @@ export class LoW extends PixiApplicationBase {
     this.resize();
 
     console.log("Current turn:", this.currentTurn);
+    console.log("Press [Enter] to advance to next turn");
   }
 
   private onKeyPress(key: string) {
@@ -50,24 +55,43 @@ export class LoW extends PixiApplicationBase {
       case "Enter":
         this.advanceToNextTurn();
         break;
+      case "v":
+        if (this.selectedHex instanceof HexCity) {
+          this.selectedHex.createVillager();
+          console.log(this.selectedHex);
+        }
+        break;
     }
   }
 
   private advanceToNextTurn() {
     this.currentTurn++;
+    this.selectedCoords = undefined;
+
     this.world.values().forEach((hex) => hex.advanceToNextTurn());
     console.log("Current turn:", this.currentTurn);
   }
 
   private onHexClick(coord: HexCoordinate) {
-    console.log(this.world.get(coord));
+    this.selectedCoords = coord;
+
+    console.log(this.selectedHex);
+    if (this.selectedHex instanceof HexCity) {
+      console.log(`Actions:
+\t[v]: Create Villager (-5 food)`);
+    }
   }
 
   protected update(): void {
     for (const hex of this.world.values()) {
       const hexGraphic = this.worldGraphics.get(hex.position);
+
       if (hexGraphic) {
         hexGraphic.tint = hex.color;
+
+        if (hex.unit) {
+          hex.unit.display.setParent(hexGraphic);
+        }
       }
     }
   }
@@ -75,4 +99,8 @@ export class LoW extends PixiApplicationBase {
   protected resize(): void {
     this.map.position.set(this.canvas.width / 2, this.canvas.height / 2);
   }
+}
+
+function throwError(msg?: string): never {
+  throw new Error(msg);
 }
