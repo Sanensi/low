@@ -1,9 +1,9 @@
 import { Graphics } from "pixi.js";
-import { Vec2 } from "../lib/Vec2";
-import { HexCoordinate } from "../lib/hex/HexCoordinate";
-import { hexToPixel } from "../lib/hex/HexCoordinatesConversion";
-import { HexMap } from "../lib/hex/HexMap";
-import { Hex, HexCity, HexField } from "./Hex";
+import { Vec2 } from "../../lib/Vec2";
+import { HexCoordinate } from "../../lib/hex/HexCoordinate";
+import { hexToPixel } from "../../lib/hex/HexCoordinatesConversion";
+import { HexMap } from "../../lib/hex/HexMap";
+import { Hex, HexCity, HexField } from "../Hex";
 
 const SCALE = Vec2.ONE.scale(100);
 const VERTICES = Array.from({ length: 6 }, (_, i) =>

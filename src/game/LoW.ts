@@ -1,6 +1,6 @@
 import { Container } from "pixi.js";
 import { PixiApplicationBase } from "../lib/PixiApplicationBase";
-import { createWorldGraphics, drawHex } from "./WorldRenderer";
+import { createWorldGraphics, drawHex } from "./graphics/WorldGraphics";
 import { createArea } from "../lib/hex/HexCoordinatesFactory";
 import { Hex, HexCity, HexField } from "./Hex";
 import { HexCoordinate } from "../lib/hex/HexCoordinate";
