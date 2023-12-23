@@ -1,6 +1,7 @@
 import { Graphics } from "pixi.js";
 import { Vec2 } from "../../lib/Vec2";
 import { Hex, HexField, HexCity } from "../Hex";
+import { getUnitDisplay } from "./UnitDisplay";
 
 export const SCALE = Vec2.ONE.scale(100);
 const VERTICES = Array.from({ length: 6 }, (_, i) =>
@@ -25,7 +26,7 @@ export function drawHex(hex: Hex, hexGraphics: Graphics) {
   hexGraphics.endFill();
 
   if (hex.unit) {
-    hexGraphics.addChild(hex.unit.display);
+    hexGraphics.addChild(getUnitDisplay(hex.unit));
   } else {
     hexGraphics.removeChildren();
   }

@@ -6,6 +6,7 @@ import { Hex, HexCity, HexField } from "./Hex";
 import { HexCoordinate } from "../lib/hex/HexCoordinate";
 import { HexMap } from "../lib/hex/HexMap";
 import { drawHex } from "./displays/HexDisplay";
+import { throwError } from "../lib/Assertion";
 
 const fields = createArea(3).map((coord) => new HexField(coord));
 const world = new HexMap<Hex>(fields.map((hex) => [hex.position, hex]));
@@ -87,8 +88,4 @@ export class LoW extends PixiApplicationBase {
   protected resize(): void {
     this.map.position.set(this.canvas.width / 2, this.canvas.height / 2);
   }
-}
-
-function throwError(msg?: string): never {
-  throw new Error(msg);
 }
