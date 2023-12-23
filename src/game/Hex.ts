@@ -6,13 +6,25 @@ const UNIT_FOOD_COST = 5;
 
 export abstract class Hex {
   protected _unit?: Unit;
-  readonly isSelected: boolean = false;
+  protected _isSelected = false;
 
   get unit() {
     return this._unit;
   }
 
+  get isSelected() {
+    return this._isSelected;
+  }
+
   constructor(readonly position: HexCoordinate) {}
+
+  select(): void {
+    this._isSelected = true;
+  }
+
+  unselect(): void {
+    this._isSelected = false;
+  }
 
   abstract advanceToNextTurn(): void;
 }

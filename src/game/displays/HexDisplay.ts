@@ -9,21 +9,24 @@ const VERTICES = Array.from({ length: 6 }, (_, i) =>
 );
 
 type HexAttributes = {
-  fillCollor: number;
+  fillColor: number;
+  strokeColor: number;
+  zIndex: number;
 };
 
 export function drawHex(hex: Hex, hexGraphics: Graphics) {
-  const { fillCollor } = mapHexToAttributes(hex);
+  const { fillColor, strokeColor, zIndex } = mapHexToAttributes(hex);
 
   hexGraphics.clear();
-  hexGraphics.beginFill(fillCollor);
-  hexGraphics.lineStyle({ width: 10, color: 0x000000 });
+  hexGraphics.beginFill(fillColor);
+  hexGraphics.lineStyle({ width: 10, color: strokeColor });
   hexGraphics.moveTo(VERTICES[0].x, VERTICES[0].y);
   for (let i = 0; i < VERTICES.length + 2; i++) {
     const vertice = VERTICES[i % VERTICES.length];
     hexGraphics.lineTo(vertice.x, vertice.y);
   }
   hexGraphics.endFill();
+  hexGraphics.zIndex = zIndex;
 
   if (hex.unit) {
     hexGraphics.addChild(getUnitDisplay(hex.unit));
@@ -33,19 +36,26 @@ export function drawHex(hex: Hex, hexGraphics: Graphics) {
 }
 
 function mapHexToAttributes(hex: Hex): HexAttributes {
+  const attributes: HexAttributes = {
+    fillColor: 0xffffff,
+    strokeColor: 0x000000,
+    zIndex: 0,
+  };
+
   if (hex instanceof HexField) {
-    return {
-      fillCollor: 0x00c040,
-    };
+    attributes.fillColor = 0x00c040;
   }
 
   if (hex instanceof HexCity) {
-    return {
-      fillCollor: 0x808080,
-    };
+    attributes.fillColor = 0x808080;
   }
 
-  throw new Error("Unsupported hex type");
+  if (hex.isSelected) {
+    attributes.strokeColor = 0x0000ff;
+    attributes.zIndex = 1;
+  }
+
+  return attributes;
 }
 
 function flatHexCorner(center: Vec2, scale: Vec2, i: number) {

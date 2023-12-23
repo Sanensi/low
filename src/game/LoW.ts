@@ -42,6 +42,7 @@ export class LoW extends PixiApplicationBase {
       hexGraphic.addEventListener("click", () => this.onHexClick(coord));
       this.map.addChild(hexGraphic);
     }
+    this.map.sortableChildren = true;
     this.map.scale.set(0.5);
     this.app.stage.addChild(this.map);
     this.resize();
@@ -84,7 +85,9 @@ export class LoW extends PixiApplicationBase {
   }
 
   private onHexClick(coord: HexCoordinate) {
+    this.selectedHex?.unselect();
     this.selectedCoords = coord;
+    this.selectedHex?.select();
 
     console.log(this.selectedHex, this.worldGraphics.get(coord));
 
