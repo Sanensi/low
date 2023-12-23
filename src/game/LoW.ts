@@ -1,10 +1,11 @@
 import { Container } from "pixi.js";
 import { PixiApplicationBase } from "../lib/PixiApplicationBase";
-import { createWorldGraphics, drawHex } from "./graphics/WorldGraphics";
+import { createWorldGraphics } from "./graphics/WorldGraphics";
 import { createArea } from "../lib/hex/HexCoordinatesFactory";
 import { Hex, HexCity, HexField } from "./Hex";
 import { HexCoordinate } from "../lib/hex/HexCoordinate";
 import { HexMap } from "../lib/hex/HexMap";
+import { drawHex } from "./graphics/HexGraphics";
 
 const fields = createArea(3).map((coord) => new HexField(coord));
 const world = new HexMap<Hex>(fields.map((hex) => [hex.position, hex]));
