@@ -7,6 +7,7 @@ import { HexCoordinate } from "../lib/hex/HexCoordinate";
 import { HexMap } from "../lib/hex/HexMap";
 import { drawHex } from "./displays/HexDisplay";
 import { throwError } from "../lib/Assertion";
+import { Unit } from "./Unit";
 
 const fields = createArea(3).map((coord) => new HexField(coord));
 const world = new HexMap<Hex>(fields.map((hex) => [hex.position, hex]));
@@ -18,10 +19,13 @@ const worldGraphics = createWorldGraphics(world.keys());
 export class LoW extends PixiApplicationBase {
   private world = world;
   private currentTurn = 1;
+
   private selectedCoords?: HexCoordinate;
   private get selectedHex() {
     return this.world.get(this.selectedCoords);
   }
+
+  private selectedUnit?: Unit;
 
   private map = new Container();
   private worldGraphics = worldGraphics;
@@ -57,6 +61,18 @@ export class LoW extends PixiApplicationBase {
           console.log(this.selectedHex);
         }
         break;
+      case "s":
+        if (this.selectedHex?.unit) {
+          this.selectedUnit = this.selectedHex.unit;
+          this.selectedUnit.select();
+        }
+        break;
+      case "u":
+        if (this.selectedUnit) {
+          this.selectedUnit.unselect();
+          this.selectedUnit = undefined;
+        }
+        break;
     }
   }
 
@@ -72,10 +88,27 @@ export class LoW extends PixiApplicationBase {
     this.selectedCoords = coord;
 
     console.log(this.selectedHex, this.worldGraphics.get(coord));
-    if (this.selectedHex instanceof HexCity) {
-      console.log(`Actions:
-\t[v]: Create Villager (-5 food)`);
+
+    const actionDescription = ["Actions:"];
+    if (this.selectedHex) {
+      if (this.selectedHex instanceof HexCity) {
+        actionDescription.push("\t[v]: Create Villager (-5 food)");
+      }
+
+      if (this.selectedHex?.unit) {
+        actionDescription.push("\t[s]: Select Unit");
+      }
     }
+
+    if (this.selectedUnit) {
+      actionDescription.push("\t[u]: Unselect Unit");
+    }
+
+    if (actionDescription.length === 1) {
+      actionDescription.push("\tNo action available");
+    }
+
+    console.log(actionDescription.join("\n"));
   }
 
   protected update(): void {

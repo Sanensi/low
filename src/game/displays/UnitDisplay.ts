@@ -7,10 +7,17 @@ const VILLAGER_DISPLAY = createTextDisplay("V");
 const UNIT_DISPLAY_MAP = new Map([[Villager, VILLAGER_DISPLAY]]);
 
 export function getUnitDisplay(unit: Unit) {
-  return (
+  const display =
     UNIT_DISPLAY_MAP.get(Object.getPrototypeOf(unit).constructor) ??
-    throwError()
-  );
+    throwError();
+
+  if (unit.isSelected) {
+    display.style.fill = 0x0000ff;
+  } else {
+    display.style.fill = 0x000000;
+  }
+
+  return display;
 }
 
 function createTextDisplay(text: string) {

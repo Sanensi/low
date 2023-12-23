@@ -1,6 +1,6 @@
 # TODO
 
-- Revise rendering flow and HexGraphics lifecycle
+- Consider replacing javascript getter for functionnal getter defined in the base interface
 
 ## Notes
 

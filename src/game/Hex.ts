@@ -12,7 +12,7 @@ export interface Hex {
 }
 
 export class HexField implements Hex {
-  constructor(readonly position = new HexCoordinate(0, 0, 0)) {}
+  constructor(readonly position: HexCoordinate) {}
 
   advanceToNextTurn = noop;
 }
@@ -29,7 +29,7 @@ export class HexCity implements Hex {
     return this._unit;
   }
 
-  constructor(readonly position = new HexCoordinate(0, 0, 0)) {}
+  constructor(readonly position: HexCoordinate) {}
 
   advanceToNextTurn(): void {
     this._food -= CITY_FOOD_CONSUMPTION;
