@@ -1,6 +1,5 @@
 # TODO
 
-- Bump prettier printWidth
 - Revise rendering flow and HexGraphics lifecycle
 
 ## Notes

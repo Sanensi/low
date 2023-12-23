@@ -6,22 +6,18 @@ const UNIT_FOOD_COST = 5;
 
 export interface Hex {
   readonly position: HexCoordinate;
-  readonly color: number;
   readonly unit?: Unit;
 
   advanceToNextTurn(): void;
 }
 
 export class HexField implements Hex {
-  readonly color: number = 0x00c040;
-
   constructor(readonly position = new HexCoordinate(0, 0, 0)) {}
 
   advanceToNextTurn = noop;
 }
 
 export class HexCity implements Hex {
-  readonly color: number = 0x808080;
   private _food = 25;
   private _unit?: Unit;
 

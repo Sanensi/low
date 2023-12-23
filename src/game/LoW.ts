@@ -1,19 +1,17 @@
 import { Container } from "pixi.js";
 import { PixiApplicationBase } from "../lib/PixiApplicationBase";
-import { createHexGraphic, createWorldGraphics } from "./HexGraphics";
-import { Vec2 } from "../lib/Vec2";
+import { createWorldGraphics, drawHex } from "./WorldRenderer";
 import { createArea } from "../lib/hex/HexCoordinatesFactory";
 import { Hex, HexCity, HexField } from "./Hex";
 import { HexCoordinate } from "../lib/hex/HexCoordinate";
 import { HexMap } from "../lib/hex/HexMap";
 
-const SCALE = Vec2.ONE.scale(100);
-const HEX_TEMPLATE = createHexGraphic({ radius: SCALE.x, lineWidth: 10 });
-
 const fields = createArea(3).map((coord) => new HexField(coord));
 const world = new HexMap<Hex>(fields.map((hex) => [hex.position, hex]));
 const city = new HexCity(HexCoordinate.ZERO);
 world.set(city.position, city);
+
+const worldGraphics = createWorldGraphics(world.keys());
 
 export class LoW extends PixiApplicationBase {
   private world = world;
@@ -24,11 +22,7 @@ export class LoW extends PixiApplicationBase {
   }
 
   private map = new Container();
-  private worldGraphics = createWorldGraphics(
-    HEX_TEMPLATE,
-    world.keys(),
-    SCALE,
-  );
+  private worldGraphics = worldGraphics;
 
   constructor(canvas: HTMLCanvasElement) {
     super(canvas, { backgroundColor: "#ffffff", antialias: true });
@@ -75,7 +69,7 @@ export class LoW extends PixiApplicationBase {
   private onHexClick(coord: HexCoordinate) {
     this.selectedCoords = coord;
 
-    console.log(this.selectedHex);
+    console.log(this.selectedHex, this.worldGraphics.get(coord));
     if (this.selectedHex instanceof HexCity) {
       console.log(`Actions:
 \t[v]: Create Villager (-5 food)`);
@@ -84,15 +78,8 @@ export class LoW extends PixiApplicationBase {
 
   protected update(): void {
     for (const hex of this.world.values()) {
-      const hexGraphic = this.worldGraphics.get(hex.position);
-
-      if (hexGraphic) {
-        hexGraphic.tint = hex.color;
-
-        if (hex.unit) {
-          hex.unit.display.setParent(hexGraphic);
-        }
-      }
+      const hexGraphic = this.worldGraphics.get(hex.position) ?? throwError();
+      drawHex(hex, hexGraphic);
     }
   }
 
