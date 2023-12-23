@@ -58,7 +58,6 @@ export class LoW extends PixiApplicationBase {
       case "v":
         if (this.selectedHex instanceof HexCity) {
           this.selectedHex.createVillager();
-          console.log(this.selectedHex);
         }
         break;
       case "s":
@@ -91,11 +90,14 @@ export class LoW extends PixiApplicationBase {
 
     const actionDescription = ["Actions:"];
     if (this.selectedHex) {
-      if (this.selectedHex instanceof HexCity) {
+      if (
+        this.selectedHex instanceof HexCity &&
+        this.selectedHex.canCreateVillager()
+      ) {
         actionDescription.push("\t[v]: Create Villager (-5 food)");
       }
 
-      if (this.selectedHex?.unit) {
+      if (this.selectedHex.unit) {
         actionDescription.push("\t[s]: Select Unit");
       }
     }
