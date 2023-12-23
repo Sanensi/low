@@ -16,6 +16,9 @@ const city = new HexCity(HexCoordinate.ZERO);
 world.set(city.position, city);
 
 export class LoW extends PixiApplicationBase {
+  private world = world;
+  private currentTurn = 1;
+
   private map = new Container();
   private worldGraphics = createWorldGraphics(
     HEX_TEMPLATE,
@@ -29,20 +32,39 @@ export class LoW extends PixiApplicationBase {
   }
 
   protected start(): void {
+    window.addEventListener("keypress", (e) => this.onKeyPress(e.key));
     for (const [coord, hexGraphic] of this.worldGraphics.entries()) {
       hexGraphic.eventMode = "static";
-      hexGraphic.addEventListener("click", () => {
-        console.log(world.get(coord));
-      });
+      hexGraphic.addEventListener("click", () => this.onHexClick(coord));
       this.map.addChild(hexGraphic);
     }
     this.map.scale.set(0.5);
     this.app.stage.addChild(this.map);
     this.resize();
+
+    console.log("Current turn:", this.currentTurn);
+  }
+
+  private onKeyPress(key: string) {
+    switch (key) {
+      case "Enter":
+        this.advanceToNextTurn();
+        break;
+    }
+  }
+
+  private advanceToNextTurn() {
+    this.currentTurn++;
+    this.world.values().forEach((hex) => hex.advanceToNextTurn());
+    console.log("Current turn:", this.currentTurn);
+  }
+
+  private onHexClick(coord: HexCoordinate) {
+    console.log(this.world.get(coord));
   }
 
   protected update(): void {
-    for (const hex of world.values()) {
+    for (const hex of this.world.values()) {
       const hexGraphic = this.worldGraphics.get(hex.position);
       if (hexGraphic) {
         hexGraphic.tint = hex.color;
@@ -53,8 +75,4 @@ export class LoW extends PixiApplicationBase {
   protected resize(): void {
     this.map.position.set(this.canvas.width / 2, this.canvas.height / 2);
   }
-}
-
-function throwError(msg?: string): never {
-  throw new Error(msg);
 }
