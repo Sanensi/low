@@ -1,6 +1,8 @@
 # TODO
 
 - Consider replacing javascript getter for functionnal getter defined in the base interface
+- Refactor: distinguish selection/highlight from base hex rendering
+  - To do so, use distinct hex graphics for each render
 
 ## Notes
 

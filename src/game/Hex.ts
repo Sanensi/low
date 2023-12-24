@@ -1,13 +1,14 @@
 import { HexCoordinate } from "../lib/hex/HexCoordinate";
+import { Traversable } from "./HexPaths";
 import { Unit, Villager } from "./Unit";
 
 const CITY_FOOD_CONSUMPTION = 1;
 const UNIT_FOOD_COST = 5;
 
-export abstract class Hex {
+export abstract class Hex implements Traversable {
   protected _unit?: Unit;
   protected _isSelected = false;
-  readonly isObstacle: boolean = false;
+  readonly isTraversable: boolean = true;
 
   get unit() {
     return this._unit;
@@ -35,7 +36,7 @@ export class HexField extends Hex {
 }
 
 export class HexWater extends Hex {
-  readonly isObstacle = true;
+  readonly isTraversable = false;
 
   advanceToNextTurn = noop;
 }
