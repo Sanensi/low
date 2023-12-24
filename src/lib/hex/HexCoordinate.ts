@@ -11,6 +11,10 @@ export class HexCoordinate {
     hexagonalConstraint(q, r, s);
   }
 
+  equals(other: HexCoordinate) {
+    return this.q === other.q && this.r === other.r && this.s === other.s;
+  }
+
   add(other: HexCoordinate) {
     return new HexCoordinate(
       this.q + other.q,
@@ -21,6 +25,10 @@ export class HexCoordinate {
 
   scale(s: number) {
     return new HexCoordinate(this.q * s, this.r * s, this.s * s);
+  }
+
+  neighbors() {
+    return HexCoordinate.UNIT_HEXES.map((unitHex) => this.add(unitHex));
   }
 
   toString() {

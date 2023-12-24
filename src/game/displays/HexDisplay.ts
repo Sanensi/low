@@ -19,6 +19,7 @@ export function drawHex(hex: Hex, hexGraphics: Graphics) {
   const { fillColor, strokeColor, strokeWidth, zIndex } =
     mapHexToAttributes(hex);
 
+  hexGraphics.alpha = 1;
   hexGraphics.clear();
   hexGraphics.beginFill(fillColor);
   hexGraphics.lineStyle({ width: strokeWidth, color: strokeColor });

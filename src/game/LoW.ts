@@ -8,6 +8,7 @@ import { HexMap } from "../lib/hex/HexMap";
 import { drawHex } from "./displays/HexDisplay";
 import { throwError } from "../lib/Assertion";
 import { Unit } from "./Unit";
+import { findReachableHex } from "./HexPaths";
 
 const fields = createArea(4).map((coord) => new HexField(coord));
 const world = new HexMap<Hex>(fields.map((hex) => [hex.position, hex]));
@@ -43,6 +44,7 @@ export class LoW extends PixiApplicationBase {
   }
 
   private selectedUnit?: Unit;
+  private reachableHexes?: HexCoordinate[];
 
   private map = new Container();
   private worldGraphics = worldGraphics;
@@ -82,12 +84,18 @@ export class LoW extends PixiApplicationBase {
         if (this.selectedHex?.unit) {
           this.selectedUnit = this.selectedHex.unit;
           this.selectedUnit.select();
+          this.reachableHexes = findReachableHex(
+            this.selectedHex.position,
+            this.selectedHex.unit.movement,
+            this.world,
+          );
         }
         break;
       case "u":
         if (this.selectedUnit) {
           this.selectedUnit.unselect();
           this.selectedUnit = undefined;
+          this.reachableHexes = undefined;
         }
         break;
     }
@@ -137,6 +145,11 @@ export class LoW extends PixiApplicationBase {
     for (const hex of this.world.values()) {
       const hexGraphic = this.worldGraphics.get(hex.position) ?? throwError();
       drawHex(hex, hexGraphic);
+    }
+
+    for (const coord of this.reachableHexes ?? []) {
+      const hexGraphic = this.worldGraphics.get(coord) ?? throwError();
+      hexGraphic.alpha = 0.5;
     }
   }
 
