@@ -38,6 +38,8 @@ export class LoW extends PixiApplicationBase {
   private world = world;
   private currentTurn = 1;
 
+  private highlightedCoords?: HexCoordinate;
+
   private selectedCoords?: HexCoordinate;
   private get selectedHex() {
     return this.world.get(this.selectedCoords);
@@ -59,6 +61,12 @@ export class LoW extends PixiApplicationBase {
     for (const [coord, hexGraphic] of this.worldGraphics.entries()) {
       hexGraphic.eventMode = "static";
       hexGraphic.addEventListener("click", () => this.onHexClick(coord));
+      hexGraphic.addEventListener("mouseenter", () => {
+        this.highlightedCoords = coord;
+      });
+      hexGraphic.addEventListener("mouseleave", () => {
+        this.highlightedCoords = undefined;
+      });
       this.map.addChild(hexGraphic);
     }
     this.map.sortableChildren = true;
@@ -150,6 +158,12 @@ export class LoW extends PixiApplicationBase {
     for (const coord of this.reachableHexes ?? []) {
       const hexGraphic = this.worldGraphics.get(coord) ?? throwError();
       hexGraphic.alpha = 0.5;
+    }
+
+    if (this.highlightedCoords) {
+      const hexGraphic =
+        this.worldGraphics.get(this.highlightedCoords) ?? throwError();
+      hexGraphic.tint = 0xc0c0c0;
     }
   }
 

@@ -20,6 +20,7 @@ export function drawHex(hex: Hex, hexGraphics: Graphics) {
     mapHexToAttributes(hex);
 
   hexGraphics.alpha = 1;
+  hexGraphics.tint = 0xffffff;
   hexGraphics.clear();
   hexGraphics.beginFill(fillColor);
   hexGraphics.lineStyle({ width: strokeWidth, color: strokeColor });
