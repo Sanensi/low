@@ -19,6 +19,10 @@ export class HexMap<T> {
     return this.map.get(key.toString())?.value;
   }
 
+  has(key: HexCoordinate) {
+    return this.map.has(key.toString());
+  }
+
   keys() {
     return [...this.map.values()].map(({ key }) => key);
   }

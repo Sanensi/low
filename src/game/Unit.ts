@@ -1,18 +1,19 @@
-export interface Unit {
-  readonly isSelected: boolean;
-  readonly movement: number;
+import { HexCoordinate } from "../lib/hex/HexCoordinate";
 
-  select(): void;
-  unselect(): void;
-}
-
-export class Villager implements Unit {
+export abstract class Unit {
   readonly movement = 3;
-  private _isSelected = false;
 
+  protected _plannedPath?: HexCoordinate[];
+  get plannedPath() {
+    return this._plannedPath;
+  }
+
+  protected _isSelected = false;
   get isSelected() {
     return this._isSelected;
   }
+
+  constructor(readonly position: HexCoordinate) {}
 
   select(): void {
     this._isSelected = true;
@@ -21,4 +22,14 @@ export class Villager implements Unit {
   unselect(): void {
     this._isSelected = false;
   }
+
+  setPlannedPath(path: HexCoordinate[]) {
+    this._plannedPath = path;
+  }
+
+  cleatPlannedPath() {
+    this._plannedPath = undefined;
+  }
 }
+
+export class Villager extends Unit {}

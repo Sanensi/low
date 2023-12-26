@@ -55,7 +55,7 @@ export class HexCity extends Hex {
   createVillager() {
     if (this.canCreateVillager()) {
       this._food -= UNIT_FOOD_COST;
-      this._unit = new Villager();
+      this._unit = new Villager(this.position);
     }
   }
 }

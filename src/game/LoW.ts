@@ -1,14 +1,15 @@
-import { Container } from "pixi.js";
+import { Container, Graphics, LINE_CAP } from "pixi.js";
 import { PixiApplicationBase } from "../lib/PixiApplicationBase";
 import { createWorldGraphics } from "./displays/WorldDisplay";
 import { createArea } from "../lib/hex/HexCoordinatesFactory";
 import { Hex, HexCity, HexField, HexWater } from "./Hex";
 import { HexCoordinate } from "../lib/hex/HexCoordinate";
 import { HexMap } from "../lib/hex/HexMap";
-import { drawHex } from "./displays/HexDisplay";
-import { throwError } from "../lib/Assertion";
+import { SCALE, drawHex } from "./displays/HexDisplay";
+import { assert, throwError } from "../lib/Assertion";
 import { Unit } from "./Unit";
-import { findReachableHex } from "./HexPaths";
+import { findReachableHex, findShortestPath } from "./HexPaths";
+import { hexToPixel } from "../lib/hex/HexCoordinatesConversion";
 
 const fields = createArea(4).map((coord) => new HexField(coord));
 const world = new HexMap<Hex>(fields.map((hex) => [hex.position, hex]));
@@ -33,6 +34,8 @@ water.forEach((coord) => {
 });
 
 const worldGraphics = createWorldGraphics(world.keys());
+const pathGraphics = new Graphics();
+pathGraphics.zIndex = 10;
 
 export class LoW extends PixiApplicationBase {
   private world = world;
@@ -69,6 +72,9 @@ export class LoW extends PixiApplicationBase {
       });
       this.map.addChild(hexGraphic);
     }
+
+    this.map.addChild(pathGraphics);
+
     this.map.sortableChildren = true;
     this.map.scale.set(0.4);
     this.app.stage.addChild(this.map);
@@ -104,6 +110,38 @@ export class LoW extends PixiApplicationBase {
           this.selectedUnit.unselect();
           this.selectedUnit = undefined;
           this.reachableHexes = undefined;
+        }
+        break;
+      case "m":
+        if (
+          this.selectedUnit &&
+          this.selectedCoords &&
+          this.reachableHexes?.some((hex) => hex.equals(this.selectedCoords))
+        ) {
+          const { breadCrumbs } = findShortestPath(
+            this.selectedUnit.position,
+            this.selectedCoords,
+            this.world,
+          );
+
+          let currentHex = breadCrumbs.get(this.selectedCoords);
+          const path = [this.selectedCoords];
+          while (currentHex !== null) {
+            assert(currentHex);
+            path.push(currentHex);
+            currentHex = breadCrumbs.get(currentHex);
+          }
+          path.reverse();
+
+          this.selectedUnit.setPlannedPath(path);
+          this.selectedUnit.unselect();
+          this.selectedUnit = undefined;
+          this.reachableHexes = undefined;
+        }
+        break;
+      case "c":
+        if (this.selectedUnit && this.selectedUnit.plannedPath) {
+          this.selectedUnit.cleatPlannedPath();
         }
         break;
     }
@@ -142,6 +180,18 @@ export class LoW extends PixiApplicationBase {
       actionDescription.push("\t[u]: Unselect Unit");
     }
 
+    if (
+      this.selectedUnit &&
+      this.selectedCoords &&
+      this.reachableHexes?.some((hex) => hex.equals(this.selectedCoords))
+    ) {
+      actionDescription.push("\t[m]: Move Unit");
+    }
+
+    if (this.selectedUnit && this.selectedUnit.plannedPath) {
+      actionDescription.push("\t[c]: Cancel Movement");
+    }
+
     if (actionDescription.length === 1) {
       actionDescription.push("\tNo action available");
     }
@@ -150,9 +200,29 @@ export class LoW extends PixiApplicationBase {
   }
 
   protected update(): void {
+    pathGraphics.clear();
+
     for (const hex of this.world.values()) {
       const hexGraphic = this.worldGraphics.get(hex.position) ?? throwError();
       drawHex(hex, hexGraphic);
+
+      if (hex.unit?.plannedPath && hex.unit.plannedPath.length > 0) {
+        const path = hex.unit.plannedPath;
+        pathGraphics.beginFill(0xffffff, 0);
+        pathGraphics.lineStyle({
+          width: 10,
+          color: 0x000000,
+          cap: LINE_CAP.ROUND,
+          alpha: 0.5,
+        });
+        const p0 = hexToPixel(path[0], SCALE);
+        pathGraphics.moveTo(p0.x, p0.y);
+        for (let index = 1; index < path.length; index++) {
+          const p = hexToPixel(path[index], SCALE);
+          pathGraphics.lineTo(p.x, p.y);
+        }
+        pathGraphics.endFill();
+      }
     }
 
     for (const coord of this.reachableHexes ?? []) {

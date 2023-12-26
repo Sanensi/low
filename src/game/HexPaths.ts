@@ -1,3 +1,5 @@
+import { throwError } from "../lib/Assertion";
+import { Comparer, Heap } from "../lib/Heap";
 import { HexCoordinate } from "../lib/hex/HexCoordinate";
 import { HexMap } from "../lib/hex/HexMap";
 
@@ -31,4 +33,56 @@ export function findReachableHex(
   }
 
   return visited.filter((coord) => !origin.equals(coord));
+}
+
+type HexDistancePair = [HexCoordinate, number];
+
+const compareHexDistance: Comparer<HexDistancePair> = (
+  [, distanceA],
+  [, distanceB],
+) => distanceB - distanceA;
+
+export function findShortestPath(
+  origin: HexCoordinate,
+  destination: HexCoordinate,
+  world: HexMap<Traversable>,
+) {
+  const frontier = new Heap(compareHexDistance);
+  frontier.push([origin, 0]);
+
+  const breadCrumbs = new HexMap<HexCoordinate | null>();
+  const stepToReach = new HexMap<number>();
+  breadCrumbs.set(origin, null);
+  stepToReach.set(origin, 0);
+
+  while (!frontier.isEmpty) {
+    const [currentHex] = frontier.pop();
+
+    if (currentHex.equals(destination)) {
+      break;
+    }
+
+    const traversableNeighbors = currentHex
+      .neighbors()
+      .filter((neighbor) => world.get(neighbor)?.isTraversable);
+    for (const nextNeighbor of traversableNeighbors) {
+      const stepToReachNextNeighbor =
+        (stepToReach.get(currentHex) ?? throwError()) + 1;
+
+      if (
+        !breadCrumbs.has(nextNeighbor) ||
+        stepToReachNextNeighbor <
+          (stepToReach.get(nextNeighbor) ?? throwError())
+      ) {
+        frontier.push([nextNeighbor, stepToReachNextNeighbor]);
+        breadCrumbs.set(nextNeighbor, currentHex);
+        stepToReach.set(nextNeighbor, stepToReachNextNeighbor);
+      }
+    }
+  }
+
+  return {
+    breadCrumbs,
+    stepToReach,
+  };
 }

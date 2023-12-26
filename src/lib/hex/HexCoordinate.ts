@@ -11,8 +11,8 @@ export class HexCoordinate {
     hexagonalConstraint(q, r, s);
   }
 
-  equals(other: HexCoordinate) {
-    return this.q === other.q && this.r === other.r && this.s === other.s;
+  equals(other?: HexCoordinate) {
+    return this.q === other?.q && this.r === other?.r && this.s === other?.s;
   }
 
   add(other: HexCoordinate) {
