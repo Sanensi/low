@@ -1,15 +1,14 @@
-import { Container, Graphics, LINE_CAP } from "pixi.js";
+import { Container, Graphics } from "pixi.js";
 import { PixiApplicationBase } from "../lib/PixiApplicationBase";
 import { createWorldGraphics } from "./displays/WorldDisplay";
 import { createArea } from "../lib/hex/HexCoordinatesFactory";
 import { Hex, HexCity, HexField, HexWater } from "./Hex";
 import { HexCoordinate } from "../lib/hex/HexCoordinate";
 import { HexMap } from "../lib/hex/HexMap";
-import { SCALE, drawHex } from "./displays/HexDisplay";
+import { drawHex, drawPlannedPath } from "./displays/HexDisplay";
 import { assert, throwError } from "../lib/Assertion";
 import { Unit } from "./Unit";
 import { findReachableHex, findShortestPath } from "./HexPaths";
-import { hexToPixel } from "../lib/hex/HexCoordinatesConversion";
 
 const fields = createArea(4).map((coord) => new HexField(coord));
 const world = new HexMap<Hex>(fields.map((hex) => [hex.position, hex]));
@@ -35,7 +34,6 @@ water.forEach((coord) => {
 
 const worldGraphics = createWorldGraphics(world.keys());
 const pathGraphics = new Graphics();
-pathGraphics.zIndex = 10;
 
 export class LoW extends PixiApplicationBase {
   private world = world;
@@ -207,21 +205,7 @@ export class LoW extends PixiApplicationBase {
       drawHex(hex, hexGraphic);
 
       if (hex.unit?.plannedPath && hex.unit.plannedPath.length > 0) {
-        const path = hex.unit.plannedPath;
-        pathGraphics.beginFill(0xffffff, 0);
-        pathGraphics.lineStyle({
-          width: 10,
-          color: 0x000000,
-          cap: LINE_CAP.ROUND,
-          alpha: 0.5,
-        });
-        const p0 = hexToPixel(path[0], SCALE);
-        pathGraphics.moveTo(p0.x, p0.y);
-        for (let index = 1; index < path.length; index++) {
-          const p = hexToPixel(path[index], SCALE);
-          pathGraphics.lineTo(p.x, p.y);
-        }
-        pathGraphics.endFill();
+        drawPlannedPath(hex.unit.plannedPath, pathGraphics);
       }
     }
 

@@ -1,7 +1,9 @@
-import { Graphics } from "pixi.js";
+import { Graphics, LINE_CAP } from "pixi.js";
 import { Vec2 } from "../../lib/Vec2";
 import { Hex, HexField, HexCity, HexWater } from "../Hex";
 import { getUnitDisplay } from "./UnitDisplay";
+import { HexCoordinate } from "../../lib/hex/HexCoordinate";
+import { hexToPixel } from "../../lib/hex/HexCoordinatesConversion";
 
 export const SCALE = Vec2.ONE.scale(100);
 const VERTICES = Array.from({ length: 6 }, (_, i) =>
@@ -76,4 +78,22 @@ function flatHexCorner(center: Vec2, scale: Vec2, i: number) {
     center.x + scale.x * Math.cos(angleRad),
     center.y + scale.y * Math.sin(angleRad),
   );
+}
+
+export function drawPlannedPath(path: HexCoordinate[], pathGraphics: Graphics) {
+  pathGraphics.zIndex = 10;
+  pathGraphics.beginFill(0xffffff, 0);
+  pathGraphics.lineStyle({
+    width: 10,
+    color: 0x000000,
+    cap: LINE_CAP.ROUND,
+    alpha: 0.5,
+  });
+  const p0 = hexToPixel(path[0], SCALE);
+  pathGraphics.moveTo(p0.x, p0.y);
+  for (let index = 1; index < path.length; index++) {
+    const p = hexToPixel(path[index], SCALE);
+    pathGraphics.lineTo(p.x, p.y);
+  }
+  pathGraphics.endFill();
 }
