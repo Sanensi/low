@@ -9,7 +9,7 @@ import { drawHex, drawPlannedPath } from "./displays/HexDisplay";
 import { assert, throwError } from "../lib/Assertion";
 import { Unit } from "./Unit";
 import { findReachableHex, findShortestPath } from "./HexPaths";
-import { createUnitDisplay } from "./displays/UnitDisplay";
+import { createUnitDisplay, drawUnit } from "./displays/UnitDisplay";
 
 const fields = createArea(4).map((coord) => new HexField(coord));
 const world = new HexMap<Hex>(fields.map((hex) => [hex.position, hex]));
@@ -232,12 +232,7 @@ export class LoW extends PixiApplicationBase {
 
       if (hex.unit) {
         const unitDisplay = unitDisplays.get(hex.unit) ?? throwError();
-        hexGraphic.addChild(unitDisplay);
-        if (hex.unit.isSelected) {
-          unitDisplay.style.fill = 0x0000ff;
-        } else {
-          unitDisplay.style.fill = 0x000000;
-        }
+        drawUnit(hex.unit, unitDisplay, hexGraphic);
       }
 
       if (hex.unit?.plannedPath && hex.unit.plannedPath.length > 0) {
