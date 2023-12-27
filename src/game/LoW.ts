@@ -91,6 +91,10 @@ export class LoW extends PixiApplicationBase {
     this.selectedCoords = coord;
     this.selectedHex?.select();
     assert(this.selectedHex);
+    const selectedHexNeighbors = this.selectedHex.position
+      .neighbors()
+      .map((coord) => this.world.get(coord))
+      .filter((hex): hex is Hex => hex !== undefined);
 
     console.log(this.selectedHex);
 
@@ -126,15 +130,21 @@ export class LoW extends PixiApplicationBase {
     if (
       this.selectedHex instanceof HexField &&
       this.selectedHex.unit instanceof Villager &&
-      this.selectedHex.position
-        .neighbors()
-        .some(
-          (neighbor) =>
-            this.world.get(neighbor) instanceof HexCity ||
-            this.world.get(neighbor) instanceof HexFarm,
-        )
+      selectedHexNeighbors.some(
+        (neighbor) =>
+          neighbor instanceof HexCity || neighbor instanceof HexFarm,
+      )
     ) {
       actionDescription.push("\t[f]: Create Farm");
+    }
+
+    if (
+      this.selectedHex instanceof HexField &&
+      selectedHexNeighbors.some(
+        (neighbor) => neighbor instanceof HexCity && neighbor.canGrow(),
+      )
+    ) {
+      actionDescription.push("\t[g]: Grow City");
     }
 
     if (actionDescription.length === 1) {
@@ -168,6 +178,9 @@ export class LoW extends PixiApplicationBase {
         if (this.selectedUnit && this.selectedUnit.plannedPath) {
           this.selectedUnit.clearPlannedPath();
         }
+        break;
+      case "g":
+        this.growCity();
         break;
     }
   }
@@ -268,7 +281,7 @@ export class LoW extends PixiApplicationBase {
       const villager = this.selectedHex.unit;
       const neighbors = hexField.position
         .neighbors()
-        .map((coord) => this.world.get(coord) ?? throwError());
+        .map((coord) => this.world.get(coord));
       const neighborCity =
         neighbors.filter((hex): hex is HexCity => hex instanceof HexCity)[0] ??
         neighbors.filter((hex): hex is HexFarm => hex instanceof HexFarm)[0]
@@ -281,6 +294,23 @@ export class LoW extends PixiApplicationBase {
       unitDisplay.destroy();
       unitDisplays.delete(villager);
       hexField.unselect();
+    }
+  }
+
+  private growCity() {
+    const selectedHexNeighborCityHexesThatCanGrow = this.selectedHex?.position
+      .neighbors()
+      .map((coord) => this.world.get(coord))
+      .filter((hex): hex is HexCity => hex instanceof HexCity && hex.canGrow());
+
+    if (
+      this.selectedHex &&
+      selectedHexNeighborCityHexesThatCanGrow &&
+      selectedHexNeighborCityHexesThatCanGrow.length > 0
+    ) {
+      const cityHex = selectedHexNeighborCityHexesThatCanGrow[0];
+      const cityExtension = cityHex.grow(this.selectedHex);
+      this.world.set(this.selectedHex.position, cityExtension);
     }
   }
 

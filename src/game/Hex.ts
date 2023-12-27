@@ -1,10 +1,15 @@
+import { assert } from "../lib/Assertion";
 import { HexCoordinate } from "../lib/hex/HexCoordinate";
 import { Traversable } from "./HexPaths";
 import { Unit, Villager } from "./Unit";
 
+const INITIAL_CITY_FOOD = 25;
+
 const CITY_FOOD_CONSUMPTION = 1;
 const CITY_FOOD_CAP = 25;
+
 const UNIT_FOOD_COST = 5;
+const CITY_GROWTH_COST = 25;
 
 export abstract class Hex implements Traversable {
   readonly isTraversable: boolean = true;
@@ -46,33 +51,70 @@ export class HexWater extends Hex {
 }
 
 export class HexCity extends Hex {
-  private _food = 25;
+  private _food;
   private associatedFarms: HexFarm[] = [];
+  private initialCity: HexCity;
+  private size = 1;
 
-  get foodBalance() {
-    return this.associatedFarms.length - CITY_FOOD_CONSUMPTION;
+  get food() {
+    return this.initialCity._food;
   }
 
-  advanceToNextTurn(): void {
-    this._food = Math.max(
-      Math.min(this._food + this.foodBalance, CITY_FOOD_CAP),
-      0,
+  get foodBalance() {
+    return (
+      this.initialCity.associatedFarms.length -
+      CITY_FOOD_CONSUMPTION * this.initialCity.size
     );
   }
 
-  canCreateVillager() {
-    return this._food >= UNIT_FOOD_COST && this._unit === undefined;
+  constructor(position: HexCoordinate, initialCity?: HexCity) {
+    super(position);
+    this.initialCity = initialCity ?? this;
+    this._food = this.initialCity === this ? INITIAL_CITY_FOOD : 0;
   }
 
-  createVillager() {
-    if (this.canCreateVillager()) {
-      this._food -= UNIT_FOOD_COST;
-      this._unit = new Villager(this.position);
+  advanceToNextTurn(): void {
+    if (this === this.initialCity) {
+      this.initialCity._food = Math.max(
+        Math.min(
+          this.initialCity._food + this.initialCity.foodBalance,
+          CITY_FOOD_CAP * this.initialCity.size,
+        ),
+        0,
+      );
     }
   }
 
+  canCreateVillager() {
+    return this.initialCity._food >= UNIT_FOOD_COST && this._unit === undefined;
+  }
+
+  createVillager() {
+    assert(this.canCreateVillager());
+
+    this.initialCity._food -= UNIT_FOOD_COST;
+    this._unit = new Villager(this.position);
+  }
+
   addFarm(farm: HexFarm) {
-    this.associatedFarms.push(farm);
+    this.initialCity.associatedFarms.push(farm);
+  }
+
+  canGrow() {
+    return (
+      this.initialCity._food >= CITY_GROWTH_COST &&
+      this.initialCity.associatedFarms.length > 0
+    );
+  }
+
+  grow(hex: Hex): HexCity {
+    assert(this.canGrow());
+
+    this.initialCity._food -= CITY_GROWTH_COST;
+    this.initialCity.size += 1;
+    const hexCity = new HexCity(hex.position, this.initialCity);
+    hexCity._unit = hex.unit;
+    return hexCity;
   }
 }
 
