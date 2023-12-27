@@ -3,6 +3,7 @@ import { Traversable } from "./HexPaths";
 import { Unit, Villager } from "./Unit";
 
 const CITY_FOOD_CONSUMPTION = 1;
+const CITY_FOOD_CAP = 25;
 const UNIT_FOOD_COST = 5;
 
 export abstract class Hex implements Traversable {
@@ -53,7 +54,7 @@ export class HexCity extends Hex {
   }
 
   advanceToNextTurn(): void {
-    this._food += this.foodBalance;
+    this._food = Math.min(this._food + this.foodBalance, CITY_FOOD_CAP);
   }
 
   canCreateVillager() {
