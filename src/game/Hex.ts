@@ -54,7 +54,10 @@ export class HexCity extends Hex {
   }
 
   advanceToNextTurn(): void {
-    this._food = Math.min(this._food + this.foodBalance, CITY_FOOD_CAP);
+    this._food = Math.max(
+      Math.min(this._food + this.foodBalance, CITY_FOOD_CAP),
+      0,
+    );
   }
 
   canCreateVillager() {
