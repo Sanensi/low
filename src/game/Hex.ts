@@ -46,9 +46,14 @@ export class HexWater extends Hex {
 
 export class HexCity extends Hex {
   private _food = 25;
+  private associatedFarms: HexFarm[] = [];
+
+  get foodBalance() {
+    return this.associatedFarms.length - CITY_FOOD_CONSUMPTION;
+  }
 
   advanceToNextTurn(): void {
-    this._food -= CITY_FOOD_CONSUMPTION;
+    this._food += this.foodBalance;
   }
 
   canCreateVillager() {
@@ -61,10 +66,22 @@ export class HexCity extends Hex {
       this._unit = new Villager(this.position);
     }
   }
+
+  addFarm(farm: HexFarm) {
+    this.associatedFarms.push(farm);
+  }
 }
 
 export class HexFarm extends Hex {
   advanceToNextTurn = noop;
+
+  readonly associatedCity: HexCity;
+
+  constructor(position: HexCoordinate, associatedCity: HexCity) {
+    super(position);
+    this.associatedCity = associatedCity;
+    this.associatedCity.addFarm(this);
+  }
 }
 
 function noop() {}

@@ -266,7 +266,15 @@ export class LoW extends PixiApplicationBase {
     ) {
       const hexField = this.selectedHex;
       const villager = this.selectedHex.unit;
-      const hexFarm = new HexFarm(this.selectedHex.position);
+      const neighbors = hexField.position
+        .neighbors()
+        .map((coord) => this.world.get(coord) ?? throwError());
+      const neighborCity =
+        neighbors.filter((hex): hex is HexCity => hex instanceof HexCity)[0] ??
+        neighbors.filter((hex): hex is HexFarm => hex instanceof HexFarm)[0]
+          .associatedCity;
+
+      const hexFarm = new HexFarm(this.selectedHex.position, neighborCity);
       this.world.set(hexFarm.position, hexFarm);
 
       const unitDisplay = unitDisplays.get(villager) ?? throwError();
