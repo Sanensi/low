@@ -32,7 +32,7 @@ export function findReachableHex(
     }
   }
 
-  return visited.filter((coord) => !origin.equals(coord));
+  return visited;
 }
 
 type HexDistancePair = [HexCoordinate, number];

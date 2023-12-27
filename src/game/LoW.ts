@@ -10,7 +10,7 @@ import { assert, throwError } from "../lib/Assertion";
 import { Unit } from "./Unit";
 import { findReachableHex, findShortestPath } from "./HexPaths";
 import { createUnitDisplay, drawUnit } from "./displays/UnitDisplay";
-import { applyPlannedMovements } from "./World";
+import { applyPlannedMovements, isGoingToBeOccupied } from "./World";
 
 const fields = createArea(4).map((coord) => new HexField(coord));
 const world = new HexMap<Hex>(fields.map((hex) => [hex.position, hex]));
@@ -106,11 +106,17 @@ export class LoW extends PixiApplicationBase {
         if (this.selectedHex?.unit) {
           this.selectedUnit = this.selectedHex.unit;
           this.selectedUnit.select();
+          const origin = this.selectedUnit.position;
           this.reachableHexes = findReachableHex(
-            this.selectedHex.position,
+            origin,
             this.selectedHex.unit.movement,
             this.world,
-          );
+          )
+            .filter((coord) => !origin.equals(coord))
+            .filter(
+              (reachableCoord) =>
+                !isGoingToBeOccupied(reachableCoord, this.world),
+            );
         }
         break;
       case "u":
