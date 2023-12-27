@@ -24,3 +24,7 @@ Rule of thumbs to remember the meaning of each value (flat-top hexes):
 - `q` becomes positive at 3 o'clock, negative at 9 o'clock
 - `r` becomes positive at 7 o'clock, negative at 1 o'clock
 - `s` becomes positive at 11 o'clock, negative at 5 o'clock
+
+## Bugs
+
+- When canceling movement, the reachableHexes doesn't get updated

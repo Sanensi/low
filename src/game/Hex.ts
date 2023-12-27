@@ -63,4 +63,8 @@ export class HexCity extends Hex {
   }
 }
 
+export class HexFarm extends Hex {
+  advanceToNextTurn = noop;
+}
+
 function noop() {}

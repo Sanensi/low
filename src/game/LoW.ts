@@ -2,12 +2,12 @@ import { Container, Graphics, Text } from "pixi.js";
 import { PixiApplicationBase } from "../lib/PixiApplicationBase";
 import { createWorldGraphics } from "./displays/WorldDisplay";
 import { createArea } from "../lib/hex/HexCoordinatesFactory";
-import { Hex, HexCity, HexField, HexWater } from "./Hex";
+import { Hex, HexCity, HexFarm, HexField, HexWater } from "./Hex";
 import { HexCoordinate } from "../lib/hex/HexCoordinate";
 import { HexMap } from "../lib/hex/HexMap";
 import { drawHex, drawPlannedPath } from "./displays/HexDisplay";
 import { assert, throwError } from "../lib/Assertion";
-import { Unit } from "./Unit";
+import { Unit, Villager } from "./Unit";
 import { findReachableHex, findShortestPath } from "./HexPaths";
 import { createUnitDisplay, drawUnit } from "./displays/UnitDisplay";
 import { applyPlannedMovements, isGoingToBeOccupied } from "./World";
@@ -153,6 +153,29 @@ export class LoW extends PixiApplicationBase {
           this.reachableHexes = undefined;
         }
         break;
+      case "f":
+        if (
+          this.selectedHex instanceof HexField &&
+          this.selectedHex.unit instanceof Villager &&
+          this.selectedHex.position
+            .neighbors()
+            .some(
+              (neighbor) =>
+                this.world.get(neighbor) instanceof HexCity ||
+                this.world.get(neighbor) instanceof HexFarm,
+            )
+        ) {
+          const hexField = this.selectedHex;
+          const villager = this.selectedHex.unit;
+          const hexFarm = new HexFarm(this.selectedHex.position);
+          this.world.set(hexFarm.position, hexFarm);
+
+          const unitDisplay = unitDisplays.get(villager) ?? throwError();
+          unitDisplay.destroy();
+          unitDisplays.delete(villager);
+          hexField.unselect();
+        }
+        break;
       case "c":
         if (this.selectedUnit && this.selectedUnit.plannedPath) {
           this.selectedUnit.clearPlannedPath();
@@ -180,9 +203,9 @@ export class LoW extends PixiApplicationBase {
     this.selectedHex?.unselect();
     this.selectedCoords = coord;
     this.selectedHex?.select();
-    const selectedHex = this.selectedHex ?? throwError();
+    assert(this.selectedHex);
 
-    console.log(selectedHex);
+    console.log(this.selectedHex);
 
     const actionDescription = ["Actions:"];
 
@@ -193,7 +216,7 @@ export class LoW extends PixiApplicationBase {
       actionDescription.push("\t[v]: Create Villager (-5 food)");
     }
 
-    if (selectedHex.unit) {
+    if (this.selectedHex.unit) {
       actionDescription.push("\t[s]: Select Unit");
     }
 
@@ -211,6 +234,20 @@ export class LoW extends PixiApplicationBase {
 
     if (this.selectedUnit && this.selectedUnit.plannedPath) {
       actionDescription.push("\t[c]: Cancel Movement");
+    }
+
+    if (
+      this.selectedHex instanceof HexField &&
+      this.selectedHex.unit instanceof Villager &&
+      this.selectedHex.position
+        .neighbors()
+        .some(
+          (neighbor) =>
+            this.world.get(neighbor) instanceof HexCity ||
+            this.world.get(neighbor) instanceof HexFarm,
+        )
+    ) {
+      actionDescription.push("\t[f]: Create Farm");
     }
 
     if (actionDescription.length === 1) {

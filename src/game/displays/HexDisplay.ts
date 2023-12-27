@@ -1,6 +1,6 @@
 import { Graphics, LINE_CAP } from "pixi.js";
 import { Vec2 } from "../../lib/Vec2";
-import { Hex, HexField, HexCity, HexWater } from "../Hex";
+import { Hex, HexField, HexCity, HexWater, HexFarm } from "../Hex";
 import { HexCoordinate } from "../../lib/hex/HexCoordinate";
 import { hexToPixel } from "../../lib/hex/HexCoordinatesConversion";
 
@@ -54,6 +54,10 @@ function mapHexToAttributes(hex: Hex): HexAttributes {
 
   if (hex instanceof HexCity) {
     attributes.fillColor = 0x808080;
+  }
+
+  if (hex instanceof HexFarm) {
+    attributes.fillColor = 0xf5deb3;
   }
 
   if (hex.isSelected) {
