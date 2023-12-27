@@ -86,119 +86,6 @@ export class LoW extends PixiApplicationBase {
     console.log("Press [Enter] to advance to next turn");
   }
 
-  private onKeyPress(key: string) {
-    switch (key) {
-      case "Enter":
-        this.advanceToNextTurn();
-        break;
-      case "v":
-        if (
-          this.selectedHex instanceof HexCity &&
-          this.selectedHex.canCreateVillager()
-        ) {
-          this.selectedHex.createVillager();
-          const unit = this.selectedHex.unit ?? throwError();
-          const display = createUnitDisplay(unit);
-          unitDisplays.set(unit, display);
-        }
-        break;
-      case "s":
-        if (this.selectedHex?.unit) {
-          this.selectedUnit = this.selectedHex.unit;
-          this.selectedUnit.select();
-          const origin = this.selectedUnit.position;
-          this.reachableHexes = findReachableHex(
-            origin,
-            this.selectedHex.unit.movement,
-            this.world,
-          )
-            .filter((coord) => !origin.equals(coord))
-            .filter(
-              (reachableCoord) =>
-                !isGoingToBeOccupied(reachableCoord, this.world),
-            );
-        }
-        break;
-      case "u":
-        if (this.selectedUnit) {
-          this.selectedUnit.unselect();
-          this.selectedUnit = undefined;
-          this.reachableHexes = undefined;
-        }
-        break;
-      case "m":
-        if (
-          this.selectedUnit &&
-          this.selectedCoords &&
-          this.reachableHexes?.some((hex) => hex.equals(this.selectedCoords))
-        ) {
-          const { breadCrumbs } = findShortestPath(
-            this.selectedUnit.position,
-            this.selectedCoords,
-            this.world,
-          );
-
-          let currentHex = breadCrumbs.get(this.selectedCoords);
-          const path = [this.selectedCoords];
-          while (currentHex !== null) {
-            assert(currentHex);
-            path.push(currentHex);
-            currentHex = breadCrumbs.get(currentHex);
-          }
-          path.reverse();
-
-          this.selectedUnit.setPlannedPath(path);
-          this.selectedUnit.unselect();
-          this.selectedUnit = undefined;
-          this.reachableHexes = undefined;
-        }
-        break;
-      case "f":
-        if (
-          this.selectedHex instanceof HexField &&
-          this.selectedHex.unit instanceof Villager &&
-          this.selectedHex.position
-            .neighbors()
-            .some(
-              (neighbor) =>
-                this.world.get(neighbor) instanceof HexCity ||
-                this.world.get(neighbor) instanceof HexFarm,
-            )
-        ) {
-          const hexField = this.selectedHex;
-          const villager = this.selectedHex.unit;
-          const hexFarm = new HexFarm(this.selectedHex.position);
-          this.world.set(hexFarm.position, hexFarm);
-
-          const unitDisplay = unitDisplays.get(villager) ?? throwError();
-          unitDisplay.destroy();
-          unitDisplays.delete(villager);
-          hexField.unselect();
-        }
-        break;
-      case "c":
-        if (this.selectedUnit && this.selectedUnit.plannedPath) {
-          this.selectedUnit.clearPlannedPath();
-        }
-        break;
-    }
-  }
-
-  private advanceToNextTurn() {
-    this.currentTurn++;
-    applyPlannedMovements(this.world);
-    this.world.values().forEach((hex) => hex.advanceToNextTurn());
-    this.world.values().forEach((hex) => {
-      if (hex.unit?.isSelected) {
-        hex.unit.unselect();
-      }
-    });
-    this.selectedUnit = undefined;
-    this.reachableHexes = undefined;
-
-    console.log("Current turn:", this.currentTurn);
-  }
-
   private onHexClick(coord: HexCoordinate) {
     this.selectedHex?.unselect();
     this.selectedCoords = coord;
@@ -255,6 +142,138 @@ export class LoW extends PixiApplicationBase {
     }
 
     console.log(actionDescription.join("\n"));
+  }
+
+  private onKeyPress(key: string) {
+    switch (key) {
+      case "Enter":
+        this.advanceToNextTurn();
+        break;
+      case "v":
+        this.createVillager();
+        break;
+      case "s":
+        this.selectUnit();
+        break;
+      case "u":
+        this.unselectUnit();
+        break;
+      case "m":
+        this.moveUnit();
+        break;
+      case "f":
+        this.createFarm();
+        break;
+      case "c":
+        if (this.selectedUnit && this.selectedUnit.plannedPath) {
+          this.selectedUnit.clearPlannedPath();
+        }
+        break;
+    }
+  }
+
+  private advanceToNextTurn() {
+    this.currentTurn++;
+    applyPlannedMovements(this.world);
+    this.world.values().forEach((hex) => hex.advanceToNextTurn());
+    this.world.values().forEach((hex) => {
+      if (hex.unit?.isSelected) {
+        hex.unit.unselect();
+      }
+    });
+    this.selectedUnit = undefined;
+    this.reachableHexes = undefined;
+
+    console.log("Current turn:", this.currentTurn);
+  }
+
+  private createVillager() {
+    if (
+      this.selectedHex instanceof HexCity &&
+      this.selectedHex.canCreateVillager()
+    ) {
+      this.selectedHex.createVillager();
+      const unit = this.selectedHex.unit ?? throwError();
+      const display = createUnitDisplay(unit);
+      unitDisplays.set(unit, display);
+    }
+  }
+
+  private selectUnit() {
+    if (this.selectedHex?.unit) {
+      this.selectedUnit = this.selectedHex.unit;
+      this.selectedUnit.select();
+      const origin = this.selectedUnit.position;
+      this.reachableHexes = findReachableHex(
+        origin,
+        this.selectedHex.unit.movement,
+        this.world,
+      )
+        .filter((coord) => !origin.equals(coord))
+        .filter(
+          (reachableCoord) => !isGoingToBeOccupied(reachableCoord, this.world),
+        );
+    }
+  }
+
+  private unselectUnit() {
+    if (this.selectedUnit) {
+      this.selectedUnit.unselect();
+      this.selectedUnit = undefined;
+      this.reachableHexes = undefined;
+    }
+  }
+
+  private moveUnit() {
+    if (
+      this.selectedUnit &&
+      this.selectedCoords &&
+      this.reachableHexes?.some((hex) => hex.equals(this.selectedCoords))
+    ) {
+      const { breadCrumbs } = findShortestPath(
+        this.selectedUnit.position,
+        this.selectedCoords,
+        this.world,
+      );
+
+      let currentHex = breadCrumbs.get(this.selectedCoords);
+      const path = [this.selectedCoords];
+      while (currentHex !== null) {
+        assert(currentHex);
+        path.push(currentHex);
+        currentHex = breadCrumbs.get(currentHex);
+      }
+      path.reverse();
+
+      this.selectedUnit.setPlannedPath(path);
+      this.selectedUnit.unselect();
+      this.selectedUnit = undefined;
+      this.reachableHexes = undefined;
+    }
+  }
+
+  private createFarm() {
+    if (
+      this.selectedHex instanceof HexField &&
+      this.selectedHex.unit instanceof Villager &&
+      this.selectedHex.position
+        .neighbors()
+        .some(
+          (neighbor) =>
+            this.world.get(neighbor) instanceof HexCity ||
+            this.world.get(neighbor) instanceof HexFarm,
+        )
+    ) {
+      const hexField = this.selectedHex;
+      const villager = this.selectedHex.unit;
+      const hexFarm = new HexFarm(this.selectedHex.position);
+      this.world.set(hexFarm.position, hexFarm);
+
+      const unitDisplay = unitDisplays.get(villager) ?? throwError();
+      unitDisplay.destroy();
+      unitDisplays.delete(villager);
+      hexField.unselect();
+    }
   }
 
   protected update(): void {
