@@ -10,6 +10,7 @@ import { assert, throwError } from "../lib/Assertion";
 import { Unit } from "./Unit";
 import { findReachableHex, findShortestPath } from "./HexPaths";
 import { createUnitDisplay, drawUnit } from "./displays/UnitDisplay";
+import { applyPlannedMovements } from "./World";
 
 const fields = createArea(4).map((coord) => new HexField(coord));
 const world = new HexMap<Hex>(fields.map((hex) => [hex.position, hex]));
@@ -156,23 +157,13 @@ export class LoW extends PixiApplicationBase {
 
   private advanceToNextTurn() {
     this.currentTurn++;
+    applyPlannedMovements(this.world);
+    this.world.values().forEach((hex) => hex.advanceToNextTurn());
     this.world.values().forEach((hex) => {
-      if (hex.unit?.plannedPath) {
-        const targetPosition =
-          hex.unit.plannedPath[hex.unit.plannedPath.length - 1];
-        const targetHex = this.world.get(targetPosition) ?? throwError();
-        targetHex.unit = hex.unit;
-        hex.unit.position = targetPosition;
-        hex.unit.clearPlannedPath();
-        hex.unit = undefined;
-      }
-
       if (hex.unit?.isSelected) {
         hex.unit.unselect();
       }
     });
-
-    this.world.values().forEach((hex) => hex.advanceToNextTurn());
     this.selectedUnit = undefined;
     this.reachableHexes = undefined;
 
