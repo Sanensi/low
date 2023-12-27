@@ -180,21 +180,21 @@ export class LoW extends PixiApplicationBase {
     this.selectedHex?.unselect();
     this.selectedCoords = coord;
     this.selectedHex?.select();
+    const selectedHex = this.selectedHex ?? throwError();
 
-    console.log(this.selectedHex);
+    console.log(selectedHex);
 
     const actionDescription = ["Actions:"];
-    if (this.selectedHex) {
-      if (
-        this.selectedHex instanceof HexCity &&
-        this.selectedHex.canCreateVillager()
-      ) {
-        actionDescription.push("\t[v]: Create Villager (-5 food)");
-      }
 
-      if (this.selectedHex.unit) {
-        actionDescription.push("\t[s]: Select Unit");
-      }
+    if (
+      this.selectedHex instanceof HexCity &&
+      this.selectedHex.canCreateVillager()
+    ) {
+      actionDescription.push("\t[v]: Create Villager (-5 food)");
+    }
+
+    if (selectedHex.unit) {
+      actionDescription.push("\t[s]: Select Unit");
     }
 
     if (this.selectedUnit) {
