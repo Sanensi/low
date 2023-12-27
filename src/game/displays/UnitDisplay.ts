@@ -2,22 +2,13 @@ import { throwError } from "../../lib/Assertion";
 import { Unit, Villager } from "../Unit";
 import { Text } from "pixi.js";
 
-const VILLAGER_DISPLAY = createTextDisplay("V");
+const UNIT_LETTER_MAP = new Map([[Villager, "V"]]);
 
-const UNIT_DISPLAY_MAP = new Map([[Villager, VILLAGER_DISPLAY]]);
-
-export function getUnitDisplay(unit: Unit) {
-  const display =
-    UNIT_DISPLAY_MAP.get(Object.getPrototypeOf(unit).constructor) ??
+export function createUnitDisplay(unit: Unit) {
+  const letter =
+    UNIT_LETTER_MAP.get(Object.getPrototypeOf(unit).constructor) ??
     throwError();
-
-  if (unit.isSelected) {
-    display.style.fill = 0x0000ff;
-  } else {
-    display.style.fill = 0x000000;
-  }
-
-  return display;
+  return createTextDisplay(letter);
 }
 
 function createTextDisplay(text: string) {

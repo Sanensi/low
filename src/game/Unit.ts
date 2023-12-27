@@ -3,6 +3,14 @@ import { HexCoordinate } from "../lib/hex/HexCoordinate";
 export abstract class Unit {
   readonly movement = 3;
 
+  private _position: HexCoordinate;
+  get position() {
+    return this._position;
+  }
+  set position(position: HexCoordinate) {
+    this._position = position;
+  }
+
   protected _plannedPath?: HexCoordinate[];
   get plannedPath() {
     return this._plannedPath;
@@ -13,7 +21,9 @@ export abstract class Unit {
     return this._isSelected;
   }
 
-  constructor(readonly position: HexCoordinate) {}
+  constructor(position: HexCoordinate) {
+    this._position = position;
+  }
 
   select(): void {
     this._isSelected = true;
@@ -27,7 +37,7 @@ export abstract class Unit {
     this._plannedPath = path;
   }
 
-  cleatPlannedPath() {
+  clearPlannedPath() {
     this._plannedPath = undefined;
   }
 }

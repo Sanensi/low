@@ -1,7 +1,6 @@
 import { Graphics, LINE_CAP } from "pixi.js";
 import { Vec2 } from "../../lib/Vec2";
 import { Hex, HexField, HexCity, HexWater } from "../Hex";
-import { getUnitDisplay } from "./UnitDisplay";
 import { HexCoordinate } from "../../lib/hex/HexCoordinate";
 import { hexToPixel } from "../../lib/hex/HexCoordinatesConversion";
 
@@ -33,12 +32,6 @@ export function drawHex(hex: Hex, hexGraphics: Graphics) {
   }
   hexGraphics.endFill();
   hexGraphics.zIndex = zIndex;
-
-  if (hex.unit) {
-    hexGraphics.addChild(getUnitDisplay(hex.unit));
-  } else {
-    hexGraphics.removeChildren();
-  }
 }
 
 function mapHexToAttributes(hex: Hex): HexAttributes {

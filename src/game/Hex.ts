@@ -6,19 +6,24 @@ const CITY_FOOD_CONSUMPTION = 1;
 const UNIT_FOOD_COST = 5;
 
 export abstract class Hex implements Traversable {
-  protected _unit?: Unit;
-  protected _isSelected = false;
   readonly isTraversable: boolean = true;
 
+  protected _unit?: Unit;
   get unit() {
     return this._unit;
   }
+  set unit(unit: Unit | undefined) {
+    this._unit = unit;
+  }
 
+  protected _isSelected = false;
   get isSelected() {
     return this._isSelected;
   }
 
   constructor(readonly position: HexCoordinate) {}
+
+  abstract advanceToNextTurn(): void;
 
   select(): void {
     this._isSelected = true;
@@ -27,8 +32,6 @@ export abstract class Hex implements Traversable {
   unselect(): void {
     this._isSelected = false;
   }
-
-  abstract advanceToNextTurn(): void;
 }
 
 export class HexField extends Hex {

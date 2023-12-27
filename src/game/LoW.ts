@@ -1,4 +1,4 @@
-import { Container, Graphics } from "pixi.js";
+import { Container, Graphics, Text } from "pixi.js";
 import { PixiApplicationBase } from "../lib/PixiApplicationBase";
 import { createWorldGraphics } from "./displays/WorldDisplay";
 import { createArea } from "../lib/hex/HexCoordinatesFactory";
@@ -9,6 +9,7 @@ import { drawHex, drawPlannedPath } from "./displays/HexDisplay";
 import { assert, throwError } from "../lib/Assertion";
 import { Unit } from "./Unit";
 import { findReachableHex, findShortestPath } from "./HexPaths";
+import { createUnitDisplay } from "./displays/UnitDisplay";
 
 const fields = createArea(4).map((coord) => new HexField(coord));
 const world = new HexMap<Hex>(fields.map((hex) => [hex.position, hex]));
@@ -34,6 +35,8 @@ water.forEach((coord) => {
 
 const worldGraphics = createWorldGraphics(world.keys());
 const pathGraphics = new Graphics();
+
+const unitDisplays = new Map<Unit, Text>();
 
 export class LoW extends PixiApplicationBase {
   private world = world;
@@ -88,8 +91,14 @@ export class LoW extends PixiApplicationBase {
         this.advanceToNextTurn();
         break;
       case "v":
-        if (this.selectedHex instanceof HexCity) {
+        if (
+          this.selectedHex instanceof HexCity &&
+          this.selectedHex.canCreateVillager()
+        ) {
           this.selectedHex.createVillager();
+          const unit = this.selectedHex.unit ?? throwError();
+          const display = createUnitDisplay(unit);
+          unitDisplays.set(unit, display);
         }
         break;
       case "s":
@@ -139,7 +148,7 @@ export class LoW extends PixiApplicationBase {
         break;
       case "c":
         if (this.selectedUnit && this.selectedUnit.plannedPath) {
-          this.selectedUnit.cleatPlannedPath();
+          this.selectedUnit.clearPlannedPath();
         }
         break;
     }
@@ -147,9 +156,26 @@ export class LoW extends PixiApplicationBase {
 
   private advanceToNextTurn() {
     this.currentTurn++;
-    this.selectedCoords = undefined;
+    this.world.values().forEach((hex) => {
+      if (hex.unit?.plannedPath) {
+        const targetPosition =
+          hex.unit.plannedPath[hex.unit.plannedPath.length - 1];
+        const targetHex = this.world.get(targetPosition) ?? throwError();
+        targetHex.unit = hex.unit;
+        hex.unit.position = targetPosition;
+        hex.unit.clearPlannedPath();
+        hex.unit = undefined;
+      }
+
+      if (hex.unit?.isSelected) {
+        hex.unit.unselect();
+      }
+    });
 
     this.world.values().forEach((hex) => hex.advanceToNextTurn());
+    this.selectedUnit = undefined;
+    this.reachableHexes = undefined;
+
     console.log("Current turn:", this.currentTurn);
   }
 
@@ -203,6 +229,16 @@ export class LoW extends PixiApplicationBase {
     for (const hex of this.world.values()) {
       const hexGraphic = this.worldGraphics.get(hex.position) ?? throwError();
       drawHex(hex, hexGraphic);
+
+      if (hex.unit) {
+        const unitDisplay = unitDisplays.get(hex.unit) ?? throwError();
+        hexGraphic.addChild(unitDisplay);
+        if (hex.unit.isSelected) {
+          unitDisplay.style.fill = 0x0000ff;
+        } else {
+          unitDisplay.style.fill = 0x000000;
+        }
+      }
 
       if (hex.unit?.plannedPath && hex.unit.plannedPath.length > 0) {
         drawPlannedPath(hex.unit.plannedPath, pathGraphics);

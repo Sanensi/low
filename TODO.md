@@ -1,9 +1,14 @@
 # TODO
 
 - Consider replacing javascript getter for functionnal getter defined in the base interface
+- Refactor: Remove duplicate Unit selection state
 - Refactor: distinguish selection/highlight from base hex rendering
-  - To do so, use distinct hex graphics for each render
+  - To do so, use distinct hex graphics for each rendered element
 - Refactor: Render changes to hex display only after the user interact with the game instead of every frames
+  - Two potential solutions:
+    - Make the ui states completly distinct from the game state and synchronize them on user actions
+    - OR
+    - Bind each piece of ui to its game state representation, syncing it every time its associated object state is updated
 
 ## Notes
 
