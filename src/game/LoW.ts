@@ -321,7 +321,7 @@ export class LoW extends PixiApplicationBase {
       .filter((hex): hex is HexCity => hex instanceof HexCity && hex.canGrow());
 
     if (
-      this.selectedHex &&
+      this.selectedHex instanceof HexField &&
       selectedHexNeighborCityHexesThatCanGrow &&
       selectedHexNeighborCityHexesThatCanGrow.length > 0
     ) {
