@@ -54,7 +54,7 @@ export class HexCity extends Hex {
   private _food;
   private associatedFarms: HexFarm[] = [];
   private initialCity: HexCity;
-  private size = 1;
+  private _size = 1;
 
   get food() {
     return this.initialCity._food;
@@ -63,8 +63,12 @@ export class HexCity extends Hex {
   get foodBalance() {
     return (
       this.initialCity.associatedFarms.length -
-      CITY_FOOD_CONSUMPTION * this.initialCity.size
+      CITY_FOOD_CONSUMPTION * this.initialCity._size
     );
+  }
+
+  get foodCap() {
+    return this.initialCity._size * CITY_FOOD_CAP;
   }
 
   constructor(position: HexCoordinate, initialCity?: HexCity) {
@@ -78,7 +82,7 @@ export class HexCity extends Hex {
       this.initialCity._food = Math.max(
         Math.min(
           this.initialCity._food + this.initialCity.foodBalance,
-          CITY_FOOD_CAP * this.initialCity.size,
+          this.initialCity.foodCap,
         ),
         0,
       );
@@ -111,7 +115,7 @@ export class HexCity extends Hex {
     assert(this.canGrow());
 
     this.initialCity._food -= CITY_GROWTH_COST;
-    this.initialCity.size += 1;
+    this.initialCity._size += 1;
     const hexCity = new HexCity(hex.position, this.initialCity);
     hexCity._unit = hex.unit;
     return hexCity;

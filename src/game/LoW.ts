@@ -96,7 +96,24 @@ export class LoW extends PixiApplicationBase {
       .map((coord) => this.world.get(coord))
       .filter((hex): hex is Hex => hex !== undefined);
 
-    console.log(this.selectedHex);
+    if (this.selectedHex instanceof HexCity) {
+      const lines = [
+        "City:",
+        `\t(${this.selectedHex.food}/${this.selectedHex.foodCap}) Food (${this.selectedHex.foodBalance}/turn)`,
+      ];
+
+      console.log(lines.join("\n"));
+    }
+
+    if (this.selectedHex instanceof HexField) {
+      console.log("Fields");
+    }
+
+    if (this.selectedHex instanceof HexFarm) {
+      const lines = ["Farms:", `\t(+1 Food/turn)`];
+
+      console.log(lines.join("\n"));
+    }
 
     const actionDescription = ["Actions:"];
 
@@ -144,7 +161,7 @@ export class LoW extends PixiApplicationBase {
         (neighbor) => neighbor instanceof HexCity && neighbor.canGrow(),
       )
     ) {
-      actionDescription.push("\t[g]: Grow City");
+      actionDescription.push("\t[g]: Grow City (-25 food)");
     }
 
     if (actionDescription.length === 1) {
