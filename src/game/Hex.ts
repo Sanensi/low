@@ -52,7 +52,7 @@ export class HexWater extends Hex {
 
 export class HexCity extends Hex {
   private _food;
-  private associatedFarms: HexFarm[] = [];
+  private associatedFarms = new Set<HexFarm>();
   private initialCity: HexCity;
   private _size = 1;
 
@@ -62,7 +62,7 @@ export class HexCity extends Hex {
 
   get foodBalance() {
     return (
-      this.initialCity.associatedFarms.length -
+      this.initialCity.associatedFarms.size -
       CITY_FOOD_CONSUMPTION * this.initialCity._size
     );
   }
@@ -101,13 +101,13 @@ export class HexCity extends Hex {
   }
 
   addFarm(farm: HexFarm) {
-    this.initialCity.associatedFarms.push(farm);
+    this.initialCity.associatedFarms.add(farm);
   }
 
   canGrow() {
     return (
       this.initialCity._food >= CITY_GROWTH_COST &&
-      this.initialCity.associatedFarms.length > 0
+      this.initialCity.associatedFarms.size > 0
     );
   }
 
@@ -118,6 +118,11 @@ export class HexCity extends Hex {
     this.initialCity._size += 1;
     const hexCity = new HexCity(hex.position, this.initialCity);
     hexCity._unit = hex.unit;
+
+    if (hex instanceof HexFarm) {
+      hex.associatedCity.initialCity.associatedFarms.delete(hex);
+    }
+
     return hexCity;
   }
 }
