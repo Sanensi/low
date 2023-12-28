@@ -11,6 +11,7 @@ import { Unit, Villager } from "./Unit";
 import { findReachableHex, findShortestPath } from "./HexPaths";
 import { createUnitDisplay, drawUnit } from "./displays/UnitDisplay";
 import { applyPlannedMovements, isGoingToBeOccupied } from "./World";
+import { serialize } from "./HexMap";
 
 const fields = createArea(4).map((coord) => new HexField(coord));
 const world = new HexMap<Hex>(fields.map((hex) => [hex.position, hex]));
@@ -38,6 +39,8 @@ const worldGraphics = createWorldGraphics(world.keys());
 const pathGraphics = new Graphics();
 
 const unitDisplays = new Map<Unit, Text>();
+
+console.log(serialize(world));
 
 export class LoW extends PixiApplicationBase {
   private world = world;
