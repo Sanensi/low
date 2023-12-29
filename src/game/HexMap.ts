@@ -1,8 +1,11 @@
-import { assert } from "../lib/Assertion";
+import { assert, throwError } from "../lib/Assertion";
 import { Vec2 } from "../lib/Vec2";
-import { hexToDoubleWidthCoordinates } from "../lib/hex/HexCoordinatesConversion";
+import {
+  doubleWidthCoordinatesToHex,
+  hexToDoubleWidthCoordinates,
+} from "../lib/hex/HexCoordinatesConversion";
 import { HexMap } from "../lib/hex/HexMap";
-import { Hex } from "./Hex";
+import { Hex, HexCity, HexFarm, HexField, HexWater } from "./Hex";
 
 export function serialize(map: HexMap<Hex>) {
   const coords = map
@@ -15,6 +18,8 @@ export function serialize(map: HexMap<Hex>) {
   const array2d: string[][] = [];
 
   for (const vec of coords) {
+    const hexCoord = doubleWidthCoordinatesToHex(vec);
+    const hex = map.get(hexCoord) ?? throwError();
     const offsetVec = vec.substract(originOffset);
     assert(offsetVec.x >= 0 && offsetVec.y >= 0);
 
@@ -22,7 +27,17 @@ export function serialize(map: HexMap<Hex>) {
       array2d[offsetVec.y] = [];
     }
 
-    array2d[offsetVec.y][offsetVec.x] = "0";
+    if (hex instanceof HexField) {
+      array2d[offsetVec.y][offsetVec.x] = "0";
+    } else if (hex instanceof HexWater) {
+      array2d[offsetVec.y][offsetVec.x] = "w";
+    } else if (hex instanceof HexCity) {
+      array2d[offsetVec.y][offsetVec.x] = "c";
+    } else if (hex instanceof HexFarm) {
+      array2d[offsetVec.y][offsetVec.x] = "f";
+    } else {
+      throwError("Unsupported hex type");
+    }
   }
 
   for (const line of array2d.values()) {
