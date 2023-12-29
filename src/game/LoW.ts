@@ -25,7 +25,7 @@ export class LoW extends PixiApplicationBase {
   private highlightedCoords?: HexCoordinate;
 
   private isDragging = false;
-  private initialMapPosition?: Vec2;
+  private initialMapPivotPosition?: Vec2;
   private initialMousePosition?: Vec2;
 
   private selectedCoords?: HexCoordinate;
@@ -45,6 +45,7 @@ export class LoW extends PixiApplicationBase {
   }
 
   protected start(): void {
+    this.addCameraControlListeners();
     window.addEventListener("keypress", (e) => this.onKeyPress(e.key));
     for (const [coord, hexGraphic] of this.worldGraphics.entries()) {
       hexGraphic.eventMode = "static";
@@ -59,41 +60,6 @@ export class LoW extends PixiApplicationBase {
     }
 
     this.map.addChild(pathGraphics);
-
-    window.addEventListener("mousedown", (e) => {
-      if (e.button === 2) {
-        this.isDragging = true;
-        this.initialMapPosition = new Vec2(this.map.pivot);
-        this.initialMousePosition = new Vec2(e.x, e.y);
-      }
-    });
-    window.addEventListener("mousemove", (e) => {
-      if (this.isDragging) {
-        assert(this.initialMapPosition && this.initialMousePosition);
-        const negativeScale = new Vec2(this.map.scale).scale(-1);
-        const mousePosition = new Vec2(e.x, e.y);
-        const mouseDelta = mousePosition.substract(this.initialMousePosition);
-        this.map.pivot.copyFrom(
-          this.initialMapPosition.add(mouseDelta.divide(negativeScale)),
-        );
-      }
-    });
-    window.addEventListener("mouseup", (e) => {
-      if (e.button === 2) {
-        this.isDragging = false;
-        this.initialMapPosition = undefined;
-        this.initialMousePosition = undefined;
-      }
-    });
-    window.addEventListener("wheel", (e) => {
-      assert(this.map.scale.x === this.map.scale.y);
-
-      const previousScale = this.map.scale.y;
-      const delta = e.deltaY / 1000;
-      const scale = Math.max(Math.min(previousScale - delta, 1), 0.1);
-
-      this.map.scale.set(scale, scale);
-    });
 
     this.map.sortableChildren = true;
     this.map.scale.set(0.5);
@@ -378,5 +344,45 @@ export class LoW extends PixiApplicationBase {
         this.worldGraphics.get(this.highlightedCoords) ?? throwError();
       hexGraphic.tint = 0xc0c0c0;
     }
+  }
+
+  private addCameraControlListeners() {
+    window.addEventListener("mousedown", (e) => {
+      if (e.button === 2) {
+        this.isDragging = true;
+        this.initialMapPivotPosition = new Vec2(this.map.pivot);
+        this.initialMousePosition = new Vec2(e.x, e.y);
+      }
+    });
+
+    window.addEventListener("mousemove", (e) => {
+      if (this.isDragging) {
+        assert(this.initialMapPivotPosition && this.initialMousePosition);
+        const negativeScale = new Vec2(this.map.scale).scale(-1);
+        const mousePosition = new Vec2(e.x, e.y);
+        const mouseDelta = mousePosition.substract(this.initialMousePosition);
+        this.map.pivot.copyFrom(
+          this.initialMapPivotPosition.add(mouseDelta.divide(negativeScale)),
+        );
+      }
+    });
+
+    window.addEventListener("mouseup", (e) => {
+      if (e.button === 2) {
+        this.isDragging = false;
+        this.initialMapPivotPosition = undefined;
+        this.initialMousePosition = undefined;
+      }
+    });
+
+    window.addEventListener("wheel", (e) => {
+      assert(this.map.scale.x === this.map.scale.y);
+
+      const previousScale = this.map.scale.y;
+      const delta = e.deltaY / 1000;
+      const scale = Math.max(Math.min(previousScale - delta, 1), 0.1);
+
+      this.map.scale.set(scale, scale);
+    });
   }
 }
