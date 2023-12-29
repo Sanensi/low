@@ -5,7 +5,7 @@ import {
   hexToDoubleWidthCoordinates,
 } from "../lib/hex/HexCoordinatesConversion";
 import { HexMap } from "../lib/hex/HexMap";
-import { Hex, HexCity, HexFarm, HexField, HexWater } from "./Hex";
+import { Hex, HexCity, HexField, HexWater } from "./Hex";
 
 export function serialize(map: HexMap<Hex>) {
   const coords = map
@@ -33,10 +33,8 @@ export function serialize(map: HexMap<Hex>) {
       array2d[offsetVec.y][offsetVec.x] = "w";
     } else if (hex instanceof HexCity) {
       array2d[offsetVec.y][offsetVec.x] = "c";
-    } else if (hex instanceof HexFarm) {
-      array2d[offsetVec.y][offsetVec.x] = "f";
     } else {
-      throwError("Unsupported hex type");
+      throw new Error("Unsupported hex type");
     }
   }
 
@@ -60,4 +58,44 @@ function findMinimumVec(vectors: Vec2[]) {
   }
 
   return minVec;
+}
+
+export function deserialize(mapAsString: string) {
+  const [firstLine, ...hexes] = mapAsString.split("\n");
+  const [, x, y] =
+    firstLine.match(/\((-?\d+), (-?\d+)\)/) ??
+    throwError("Couldn't parse origin offset");
+  const originOffset = new Vec2(Number.parseInt(x), Number.parseInt(y));
+
+  const map = new HexMap<Hex>();
+
+  for (let y = 0; y < hexes.length; y++) {
+    for (let x = 0; x < hexes[y].length; x++) {
+      const doubleWidthCoord = new Vec2(x, y).add(originOffset);
+      const coord = doubleWidthCoordinatesToHex(doubleWidthCoord);
+      const hex = hexes[y][x];
+
+      const isDecimalCoord =
+        !Number.isInteger(coord.q) ||
+        !Number.isInteger(coord.r) ||
+        !Number.isInteger(coord.s);
+      if (isDecimalCoord && hex !== " ") {
+        throw new Error(
+          `The "${hex}" symbol at position (${x}, ${y}) is not at a valid hex position`,
+        );
+      }
+
+      if (hex === "0") {
+        map.set(coord, new HexField(coord));
+      } else if (hex === "w") {
+        map.set(coord, new HexWater(coord));
+      } else if (hex === "c") {
+        map.set(coord, new HexCity(coord));
+      } else if (hex !== " ") {
+        throw new Error(`Unsupported symbol at position (${x}, ${y}): ${hex}`);
+      }
+    }
+  }
+
+  return map;
 }

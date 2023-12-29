@@ -1,28 +1,21 @@
 import { Container, Graphics, Text } from "pixi.js";
 import { PixiApplicationBase } from "../lib/PixiApplicationBase";
 import { createWorldGraphics } from "./displays/WorldDisplay";
-import { createArea } from "../lib/hex/HexCoordinatesFactory";
 import { Hex, HexCity, HexFarm, HexField } from "./Hex";
 import { HexCoordinate } from "../lib/hex/HexCoordinate";
-import { HexMap } from "../lib/hex/HexMap";
 import { drawHex, drawPlannedPath } from "./displays/HexDisplay";
 import { assert, throwError } from "../lib/Assertion";
 import { Unit, Villager } from "./Unit";
 import { findReachableHex, findShortestPath } from "./HexPaths";
 import { createUnitDisplay, drawUnit } from "./displays/UnitDisplay";
 import { applyPlannedMovements, isGoingToBeOccupied } from "./World";
-import { serialize } from "./HexMap";
+import { deserialize } from "./HexMap";
+import defaultHexMap from "./maps/default-map.hex?raw";
 
-const fields = createArea(4).map((coord) => new HexField(coord));
-const world = new HexMap<Hex>(fields.map((hex) => [hex.position, hex]));
-const city = new HexCity(HexCoordinate.ZERO);
-world.set(city.position, city);
-
+const world = deserialize(defaultHexMap);
 const worldGraphics = createWorldGraphics(world.keys());
 const pathGraphics = new Graphics();
 const unitDisplays = new Map<Unit, Text>();
-
-console.log(serialize(world));
 
 export class LoW extends PixiApplicationBase {
   private world = world;
