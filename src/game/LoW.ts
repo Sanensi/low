@@ -62,7 +62,7 @@ export class LoW extends PixiApplicationBase {
     this.map.addChild(pathGraphics);
 
     this.map.sortableChildren = true;
-    this.map.scale.set(0.5);
+    this.map.scale.set(0.2);
     this.map.position.set(this.canvas.width / 2, this.canvas.height / 2);
     this.app.stage.addChild(this.map);
 
