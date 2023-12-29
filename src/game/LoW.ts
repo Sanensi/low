@@ -2,7 +2,7 @@ import { Container, Graphics, Text } from "pixi.js";
 import { PixiApplicationBase } from "../lib/PixiApplicationBase";
 import { createWorldGraphics } from "./displays/WorldDisplay";
 import { createArea } from "../lib/hex/HexCoordinatesFactory";
-import { Hex, HexCity, HexFarm, HexField, HexWater } from "./Hex";
+import { Hex, HexCity, HexFarm, HexField } from "./Hex";
 import { HexCoordinate } from "../lib/hex/HexCoordinate";
 import { HexMap } from "../lib/hex/HexMap";
 import { drawHex, drawPlannedPath } from "./displays/HexDisplay";
@@ -15,29 +15,11 @@ import { serialize } from "./HexMap";
 
 const fields = createArea(4).map((coord) => new HexField(coord));
 const world = new HexMap<Hex>(fields.map((hex) => [hex.position, hex]));
-
 const city = new HexCity(HexCoordinate.ZERO);
 world.set(city.position, city);
 
-const water = [
-  new HexCoordinate(1, 3, -4),
-  new HexCoordinate(0, 3, -3),
-  new HexCoordinate(1, 1, -2),
-  new HexCoordinate(2, 0, -2),
-  new HexCoordinate(2, -1, -1),
-  new HexCoordinate(2, -2, 0),
-  new HexCoordinate(1, -2, 1),
-  new HexCoordinate(0, -2, 2),
-  new HexCoordinate(0, -3, 3),
-  new HexCoordinate(1, -4, 3),
-];
-water.forEach((coord) => {
-  world.set(coord, new HexWater(coord));
-});
-
 const worldGraphics = createWorldGraphics(world.keys());
 const pathGraphics = new Graphics();
-
 const unitDisplays = new Map<Unit, Text>();
 
 console.log(serialize(world));

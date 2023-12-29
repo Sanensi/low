@@ -2,11 +2,11 @@ import { Graphics, LINE_CAP } from "pixi.js";
 import { Vec2 } from "../../lib/Vec2";
 import { Hex, HexField, HexCity, HexWater, HexFarm } from "../Hex";
 import { HexCoordinate } from "../../lib/hex/HexCoordinate";
-import { flatHexToPixel } from "../../lib/hex/HexCoordinatesConversion";
+import { pointyHexToPixel } from "../../lib/hex/HexCoordinatesConversion";
 
 export const SCALE = Vec2.ONE.scale(100);
 const VERTICES = Array.from({ length: 6 }, (_, i) =>
-  flatHexCorner(Vec2.ZERO, SCALE, i),
+  pointyHexCorner(Vec2.ZERO, SCALE, i),
 );
 
 type HexAttributes = {
@@ -95,10 +95,10 @@ export function drawPlannedPath(path: HexCoordinate[], pathGraphics: Graphics) {
     cap: LINE_CAP.ROUND,
     alpha: 0.5,
   });
-  const p0 = flatHexToPixel(path[0], SCALE);
+  const p0 = pointyHexToPixel(path[0], SCALE);
   pathGraphics.moveTo(p0.x, p0.y);
   for (let index = 1; index < path.length; index++) {
-    const p = flatHexToPixel(path[index], SCALE);
+    const p = pointyHexToPixel(path[index], SCALE);
     pathGraphics.lineTo(p.x, p.y);
   }
   pathGraphics.endFill();
