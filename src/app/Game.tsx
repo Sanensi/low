@@ -23,6 +23,9 @@ export function Game() {
         display: "block",
       }}
       ref={canvasRef}
+      onContextMenu={(e) => {
+        e.preventDefault();
+      }}
     />
   );
 }
