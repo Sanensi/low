@@ -61,7 +61,7 @@ function mapHexToAttributes(hex: Hex): HexAttributes {
   }
 
   if (hex.isSelected) {
-    attributes.strokeColor = 0x0080ff;
+    attributes.strokeColor = 0x00ffff;
     attributes.zIndex = 2;
   }
 

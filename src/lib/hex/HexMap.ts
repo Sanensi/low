@@ -3,7 +3,7 @@ import { HexCoordinate } from "./HexCoordinate";
 export class HexMap<T> {
   private readonly map = new Map<string, { key: HexCoordinate; value: T }>();
 
-  constructor(entries: [HexCoordinate, T][] = []) {
+  constructor(entries: readonly (readonly [HexCoordinate, T])[] = []) {
     this.map = new Map(
       entries.map(([key, value]) => [key.toString(), { key, value }]),
     );
