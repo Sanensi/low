@@ -63,16 +63,19 @@ export class LoW extends PixiApplicationBase {
     window.addEventListener("mousedown", (e) => {
       if (e.button === 2) {
         this.isDragging = true;
-        this.initialMapPosition = new Vec2(this.map.position);
+        this.initialMapPosition = new Vec2(this.map.pivot);
         this.initialMousePosition = new Vec2(e.x, e.y);
       }
     });
     window.addEventListener("mousemove", (e) => {
       if (this.isDragging) {
         assert(this.initialMapPosition && this.initialMousePosition);
+        const negativeScale = new Vec2(this.map.scale).scale(-1);
         const mousePosition = new Vec2(e.x, e.y);
         const mouseDelta = mousePosition.substract(this.initialMousePosition);
-        this.map.position.copyFrom(this.initialMapPosition.add(mouseDelta));
+        this.map.pivot.copyFrom(
+          this.initialMapPosition.add(mouseDelta.divide(negativeScale)),
+        );
       }
     });
     window.addEventListener("mouseup", (e) => {
@@ -82,8 +85,18 @@ export class LoW extends PixiApplicationBase {
         this.initialMousePosition = undefined;
       }
     });
+    window.addEventListener("wheel", (e) => {
+      assert(this.map.scale.x === this.map.scale.y);
+
+      const previousScale = this.map.scale.y;
+      const delta = e.deltaY / 1000;
+      const scale = Math.max(Math.min(previousScale - delta, 1), 0.1);
+
+      this.map.scale.set(scale, scale);
+    });
+
     this.map.sortableChildren = true;
-    this.map.scale.set(0.4);
+    this.map.scale.set(0.5);
     this.map.position.set(this.canvas.width / 2, this.canvas.height / 2);
     this.app.stage.addChild(this.map);
 
