@@ -1,9 +1,9 @@
 import { assert, throwError } from "../lib/Assertion";
 import { HexCoordinate } from "../lib/hex/HexCoordinate";
 import { HexMap } from "../lib/hex/HexMap";
-import { Hex } from "./Hex";
+import { Hex, HexCity, HexFarm, HexField } from "./Hex";
 import { findReachableHex, findShortestPath } from "./HexPaths";
-import { Unit } from "./Unit";
+import { Unit, Villager } from "./Unit";
 
 export class World {
   private map = new HexMap<Hex>();
@@ -76,6 +76,35 @@ export class World {
   cancelSelectedUnitMovement() {
     if (this.selectedUnit && this.selectedUnit.plannedPath) {
       this.selectedUnit.clearPlannedPath();
+    }
+  }
+
+  createFarm() {
+    if (
+      this.selectedHex instanceof HexField &&
+      this.selectedHex.unit instanceof Villager &&
+      this.selectedHex.position
+        .neighbors()
+        .some(
+          (neighbor) =>
+            this.map.get(neighbor) instanceof HexCity ||
+            this.map.get(neighbor) instanceof HexFarm,
+        )
+    ) {
+      const hexField = this.selectedHex;
+      const villager = this.selectedHex.unit;
+      const neighbors = hexField.position
+        .neighbors()
+        .map((coord) => this.map.get(coord));
+      const neighborCity =
+        neighbors.filter((hex): hex is HexCity => hex instanceof HexCity)[0] ??
+        neighbors.filter((hex): hex is HexFarm => hex instanceof HexFarm)[0]
+          .associatedCity;
+
+      const hexFarm = new HexFarm(this.selectedHex.position, neighborCity);
+      this.map.set(hexFarm.position, hexFarm);
+
+      return villager;
     }
   }
 

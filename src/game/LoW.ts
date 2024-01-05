@@ -196,37 +196,11 @@ export class LoW extends PixiApplicationBase {
   }
 
   private createFarm() {
-    if (
-      this._world.selectedHex instanceof HexField &&
-      this._world.selectedHex.unit instanceof Villager &&
-      this._world.selectedHex.position
-        .neighbors()
-        .some(
-          (neighbor) =>
-            this.world.get(neighbor) instanceof HexCity ||
-            this.world.get(neighbor) instanceof HexFarm,
-        )
-    ) {
-      const hexField = this._world.selectedHex;
-      const villager = this._world.selectedHex.unit;
-      const neighbors = hexField.position
-        .neighbors()
-        .map((coord) => this.world.get(coord));
-      const neighborCity =
-        neighbors.filter((hex): hex is HexCity => hex instanceof HexCity)[0] ??
-        neighbors.filter((hex): hex is HexFarm => hex instanceof HexFarm)[0]
-          .associatedCity;
-
-      const hexFarm = new HexFarm(
-        this._world.selectedHex.position,
-        neighborCity,
-      );
-      this.world.set(hexFarm.position, hexFarm);
-
+    const villager = this._world.createFarm();
+    if (villager) {
       const unitDisplay = unitDisplays.get(villager) ?? throwError();
       unitDisplay.destroy();
       unitDisplays.delete(villager);
-      hexField.unselect();
     }
   }
 
