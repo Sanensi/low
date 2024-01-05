@@ -97,21 +97,15 @@ export class LoW extends PixiApplicationBase {
       actionDescription.push("\t[v]: Create Villager (-5 food)");
     }
 
-    if (this._world.selectedHex.unit) {
+    if (this._world.canSelectUnit()) {
       actionDescription.push("\t[s]: Select Unit");
     }
 
-    if (this._world.selectedUnit) {
+    if (this._world.canUnselectUnit()) {
       actionDescription.push("\t[u]: Unselect Unit");
     }
 
-    if (
-      this._world.selectedUnit &&
-      this._world.selectedHex &&
-      this._world.reachableHexes?.some((hex) =>
-        hex.equals(this._world.selectedHex?.position),
-      )
-    ) {
+    if (this._world.canMoveSelectedUnit()) {
       actionDescription.push("\t[m]: Move Unit");
     }
 

@@ -34,8 +34,12 @@ export class World {
     assert(this.selectedHex);
   }
 
+  canSelectUnit(): this is World & { selectedHex: Hex & { unit: Unit } } {
+    return !!this.selectedHex?.unit;
+  }
+
   selectUnit() {
-    if (this.selectedHex?.unit) {
+    if (this.canSelectUnit()) {
       this.selectedUnit = this.selectedHex.unit;
       const origin = this.selectedUnit.position;
       this.reachableHexes = findReachableHex(
@@ -48,19 +52,30 @@ export class World {
     }
   }
 
+  canUnselectUnit() {
+    return !!this.selectedUnit;
+  }
+
   unselectUnit() {
-    if (this.selectedUnit) {
+    if (this.canUnselectUnit()) {
       this.selectedUnit = undefined;
       this.reachableHexes = undefined;
     }
   }
 
-  moveSelectedUnit() {
-    if (
+  canMoveSelectedUnit(): this is World & {
+    selectedUnit: Unit;
+    selectedHex: Hex;
+  } {
+    return !!(
       this.selectedUnit &&
       this.selectedHex &&
       this.reachableHexes?.some((hex) => hex.equals(this.selectedHex?.position))
-    ) {
+    );
+  }
+
+  moveSelectedUnit() {
+    if (this.canMoveSelectedUnit()) {
       const { shortestPath } = findShortestPath(
         this.selectedUnit.position,
         this.selectedHex.position,
@@ -68,7 +83,7 @@ export class World {
       );
 
       this.selectedUnit.setPlannedPath(shortestPath);
-      this.selectedUnit = undefined;
+      this.selectedUnit = undefined!;
       this.reachableHexes = undefined;
     }
   }
