@@ -191,11 +191,6 @@ export class LoW extends PixiApplicationBase {
     this.currentTurn++;
     applyPlannedMovements(this.world);
     this.world.values().forEach((hex) => hex.advanceToNextTurn());
-    this.world.values().forEach((hex) => {
-      if (hex.unit?.isSelected) {
-        hex.unit.unselect();
-      }
-    });
     this.selectedUnit = undefined;
     this.reachableHexes = undefined;
 
@@ -217,7 +212,6 @@ export class LoW extends PixiApplicationBase {
   private selectUnit() {
     if (this.selectedHex?.unit) {
       this.selectedUnit = this.selectedHex.unit;
-      this.selectedUnit.select();
       const origin = this.selectedUnit.position;
       this.reachableHexes = findReachableHex(
         origin,
@@ -233,7 +227,6 @@ export class LoW extends PixiApplicationBase {
 
   private unselectUnit() {
     if (this.selectedUnit) {
-      this.selectedUnit.unselect();
       this.selectedUnit = undefined;
       this.reachableHexes = undefined;
     }
@@ -261,7 +254,6 @@ export class LoW extends PixiApplicationBase {
       path.reverse();
 
       this.selectedUnit.setPlannedPath(path);
-      this.selectedUnit.unselect();
       this.selectedUnit = undefined;
       this.reachableHexes = undefined;
     }
@@ -326,7 +318,8 @@ export class LoW extends PixiApplicationBase {
 
       if (hex.unit) {
         const unitDisplay = unitDisplays.get(hex.unit) ?? throwError();
-        drawUnit(hex.unit, unitDisplay, hexGraphic);
+        const isSelected = this.selectedUnit === hex.unit;
+        drawUnit(unitDisplay, hexGraphic, isSelected);
       }
 
       if (hex.unit?.plannedPath && hex.unit.plannedPath.length > 0) {

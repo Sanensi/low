@@ -1,7 +1,7 @@
 # TODO
 
 - Consider replacing javascript getter for functionnal getter defined in the base interface
-- Refactor: Remove duplicate Unit selection state
+- Refactor: Remove duplicate Unit selection state ✅
 - Refactor: distinguish selection/highlight from base hex rendering
   - To do so, use distinct hex graphics for each rendered element
 - Refactor: Render changes to hex display only after the user interact with the game instead of every frames

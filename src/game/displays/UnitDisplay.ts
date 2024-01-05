@@ -22,9 +22,13 @@ function createTextDisplay(text: string) {
   return textDisplay;
 }
 
-export function drawUnit(unit: Unit, unitDisplay: Text, hexGraphic: Graphics) {
+export function drawUnit(
+  unitDisplay: Text,
+  hexGraphic: Graphics,
+  isSelected: boolean,
+) {
   hexGraphic.addChild(unitDisplay);
-  if (unit.isSelected) {
+  if (isSelected) {
     unitDisplay.style.fill = 0x0000ff;
   } else {
     unitDisplay.style.fill = 0x000000;

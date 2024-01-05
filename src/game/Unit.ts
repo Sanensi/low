@@ -16,21 +16,8 @@ export abstract class Unit {
     return this._plannedPath;
   }
 
-  protected _isSelected = false;
-  get isSelected() {
-    return this._isSelected;
-  }
-
   constructor(position: HexCoordinate) {
     this._position = position;
-  }
-
-  select(): void {
-    this._isSelected = true;
-  }
-
-  unselect(): void {
-    this._isSelected = false;
   }
 
   setPlannedPath(path: HexCoordinate[]) {
