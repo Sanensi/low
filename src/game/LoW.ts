@@ -8,7 +8,7 @@ import { assert, throwError } from "../lib/Assertion";
 import { Unit, Villager } from "./Unit";
 import { findReachableHex, findShortestPath } from "./HexPaths";
 import { createUnitDisplay, drawUnit } from "./displays/UnitDisplay";
-import { applyPlannedMovements, isGoingToBeOccupied } from "./World";
+import { World, applyPlannedMovements, isGoingToBeOccupied } from "./World";
 import { deserialize } from "./HexMap";
 import defaultHexMap from "./maps/default-map.hex?raw";
 import { Vec2 } from "../lib/Vec2";
@@ -19,6 +19,7 @@ const pathGraphics = new Graphics();
 const unitDisplays = new Map<Unit, Text>();
 
 export class LoW extends PixiApplicationBase {
+  private _world: World = new World(world);
   private world = world;
   private currentTurn = 1;
 
@@ -27,11 +28,6 @@ export class LoW extends PixiApplicationBase {
   private isDragging = false;
   private initialMapPivotPosition?: Vec2;
   private initialMousePosition?: Vec2;
-
-  private selectedCoords?: HexCoordinate;
-  private get selectedHex() {
-    return this.world.get(this.selectedCoords);
-  }
 
   private selectedUnit?: Unit;
   private reachableHexes?: HexCoordinate[];
@@ -71,29 +67,26 @@ export class LoW extends PixiApplicationBase {
   }
 
   private onHexClick(coord: HexCoordinate) {
-    this.selectedHex?.unselect();
-    this.selectedCoords = coord;
-    this.selectedHex?.select();
-    assert(this.selectedHex);
-    const selectedHexNeighbors = this.selectedHex.position
+    this._world.select(coord);
+    const selectedHexNeighbors = this._world.selectedHex.position
       .neighbors()
       .map((coord) => this.world.get(coord))
       .filter((hex): hex is Hex => hex !== undefined);
 
-    if (this.selectedHex instanceof HexCity) {
+    if (this._world.selectedHex instanceof HexCity) {
       const lines = [
         "City:",
-        `\t(${this.selectedHex.food}/${this.selectedHex.foodCap}) Food (${this.selectedHex.foodBalance}/turn)`,
+        `\t(${this._world.selectedHex.food}/${this._world.selectedHex.foodCap}) Food (${this._world.selectedHex.foodBalance}/turn)`,
       ];
 
       console.log(lines.join("\n"));
     }
 
-    if (this.selectedHex instanceof HexField) {
+    if (this._world.selectedHex instanceof HexField) {
       console.log("Fields");
     }
 
-    if (this.selectedHex instanceof HexFarm) {
+    if (this._world.selectedHex instanceof HexFarm) {
       const lines = ["Farms:", `\t(+1 Food/turn)`];
 
       console.log(lines.join("\n"));
@@ -102,13 +95,13 @@ export class LoW extends PixiApplicationBase {
     const actionDescription = ["Actions:"];
 
     if (
-      this.selectedHex instanceof HexCity &&
-      this.selectedHex.canCreateVillager()
+      this._world.selectedHex instanceof HexCity &&
+      this._world.selectedHex.canCreateVillager()
     ) {
       actionDescription.push("\t[v]: Create Villager (-5 food)");
     }
 
-    if (this.selectedHex.unit) {
+    if (this._world.selectedHex.unit) {
       actionDescription.push("\t[s]: Select Unit");
     }
 
@@ -118,8 +111,10 @@ export class LoW extends PixiApplicationBase {
 
     if (
       this.selectedUnit &&
-      this.selectedCoords &&
-      this.reachableHexes?.some((hex) => hex.equals(this.selectedCoords))
+      this._world.selectedHex &&
+      this.reachableHexes?.some((hex) =>
+        hex.equals(this._world.selectedHex?.position),
+      )
     ) {
       actionDescription.push("\t[m]: Move Unit");
     }
@@ -129,8 +124,8 @@ export class LoW extends PixiApplicationBase {
     }
 
     if (
-      this.selectedHex instanceof HexField &&
-      this.selectedHex.unit instanceof Villager &&
+      this._world.selectedHex instanceof HexField &&
+      this._world.selectedHex.unit instanceof Villager &&
       selectedHexNeighbors.some(
         (neighbor) =>
           neighbor instanceof HexCity || neighbor instanceof HexFarm,
@@ -140,8 +135,8 @@ export class LoW extends PixiApplicationBase {
     }
 
     if (
-      (this.selectedHex instanceof HexField ||
-        this.selectedHex instanceof HexFarm) &&
+      (this._world.selectedHex instanceof HexField ||
+        this._world.selectedHex instanceof HexFarm) &&
       selectedHexNeighbors.some(
         (neighbor) => neighbor instanceof HexCity && neighbor.canGrow(),
       )
@@ -199,23 +194,23 @@ export class LoW extends PixiApplicationBase {
 
   private createVillager() {
     if (
-      this.selectedHex instanceof HexCity &&
-      this.selectedHex.canCreateVillager()
+      this._world.selectedHex instanceof HexCity &&
+      this._world.selectedHex.canCreateVillager()
     ) {
-      this.selectedHex.createVillager();
-      const unit = this.selectedHex.unit ?? throwError();
+      this._world.selectedHex.createVillager();
+      const unit = this._world.selectedHex.unit ?? throwError();
       const display = createUnitDisplay(unit);
       unitDisplays.set(unit, display);
     }
   }
 
   private selectUnit() {
-    if (this.selectedHex?.unit) {
-      this.selectedUnit = this.selectedHex.unit;
+    if (this._world.selectedHex?.unit) {
+      this.selectedUnit = this._world.selectedHex.unit;
       const origin = this.selectedUnit.position;
       this.reachableHexes = findReachableHex(
         origin,
-        this.selectedHex.unit.movement,
+        this._world.selectedHex.unit.movement,
         this.world,
       )
         .filter((coord) => !origin.equals(coord))
@@ -235,12 +230,14 @@ export class LoW extends PixiApplicationBase {
   private moveUnit() {
     if (
       this.selectedUnit &&
-      this.selectedCoords &&
-      this.reachableHexes?.some((hex) => hex.equals(this.selectedCoords))
+      this._world.selectedHex &&
+      this.reachableHexes?.some((hex) =>
+        hex.equals(this._world.selectedHex?.position),
+      )
     ) {
       const { shortestPath } = findShortestPath(
         this.selectedUnit.position,
-        this.selectedCoords,
+        this._world.selectedHex.position,
         this.world,
       );
 
@@ -252,9 +249,9 @@ export class LoW extends PixiApplicationBase {
 
   private createFarm() {
     if (
-      this.selectedHex instanceof HexField &&
-      this.selectedHex.unit instanceof Villager &&
-      this.selectedHex.position
+      this._world.selectedHex instanceof HexField &&
+      this._world.selectedHex.unit instanceof Villager &&
+      this._world.selectedHex.position
         .neighbors()
         .some(
           (neighbor) =>
@@ -262,8 +259,8 @@ export class LoW extends PixiApplicationBase {
             this.world.get(neighbor) instanceof HexFarm,
         )
     ) {
-      const hexField = this.selectedHex;
-      const villager = this.selectedHex.unit;
+      const hexField = this._world.selectedHex;
+      const villager = this._world.selectedHex.unit;
       const neighbors = hexField.position
         .neighbors()
         .map((coord) => this.world.get(coord));
@@ -272,7 +269,10 @@ export class LoW extends PixiApplicationBase {
         neighbors.filter((hex): hex is HexFarm => hex instanceof HexFarm)[0]
           .associatedCity;
 
-      const hexFarm = new HexFarm(this.selectedHex.position, neighborCity);
+      const hexFarm = new HexFarm(
+        this._world.selectedHex.position,
+        neighborCity,
+      );
       this.world.set(hexFarm.position, hexFarm);
 
       const unitDisplay = unitDisplays.get(villager) ?? throwError();
@@ -283,20 +283,23 @@ export class LoW extends PixiApplicationBase {
   }
 
   private growCity() {
-    const selectedNeighborCityHexesThatCanGrow = this.selectedHex?.position
-      .neighbors()
-      .map((coord) => this.world.get(coord))
-      .filter((hex): hex is HexCity => hex instanceof HexCity && hex.canGrow());
+    const selectedNeighborCityHexesThatCanGrow =
+      this._world.selectedHex?.position
+        .neighbors()
+        .map((coord) => this.world.get(coord))
+        .filter(
+          (hex): hex is HexCity => hex instanceof HexCity && hex.canGrow(),
+        );
 
     if (
-      (this.selectedHex instanceof HexField ||
-        this.selectedHex instanceof HexFarm) &&
+      (this._world.selectedHex instanceof HexField ||
+        this._world.selectedHex instanceof HexFarm) &&
       selectedNeighborCityHexesThatCanGrow &&
       selectedNeighborCityHexesThatCanGrow.length > 0
     ) {
       const cityHex = selectedNeighborCityHexesThatCanGrow[0];
-      const cityExtension = cityHex.grow(this.selectedHex);
-      this.world.set(this.selectedHex.position, cityExtension);
+      const cityExtension = cityHex.grow(this._world.selectedHex);
+      this.world.set(this._world.selectedHex.position, cityExtension);
     }
   }
 

@@ -1,7 +1,27 @@
-import { throwError } from "../lib/Assertion";
+import { assert, throwError } from "../lib/Assertion";
 import { HexCoordinate } from "../lib/hex/HexCoordinate";
 import { HexMap } from "../lib/hex/HexMap";
 import { Hex } from "./Hex";
+
+export class World {
+  private map = new HexMap<Hex>();
+
+  private selectedCoords?: HexCoordinate;
+  get selectedHex() {
+    return this.map.get(this.selectedCoords);
+  }
+
+  constructor(hexMap: HexMap<Hex>) {
+    this.map = hexMap;
+  }
+
+  select(coord: HexCoordinate): asserts this is World & { selectedHex: Hex } {
+    this.selectedHex?.unselect();
+    this.selectedCoords = coord;
+    this.selectedHex?.select();
+    assert(this.selectedHex);
+  }
+}
 
 export function applyPlannedMovements(world: HexMap<Hex>) {
   world.values().forEach((hex) => {
