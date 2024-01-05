@@ -379,7 +379,7 @@ export class LoW extends PixiApplicationBase {
       assert(this.map.scale.x === this.map.scale.y);
 
       const previousScale = this.map.scale.y;
-      const delta = e.deltaY / 1000;
+      const delta = e.deltaY / 2500;
       const scale = Math.max(Math.min(previousScale - delta, 1), 0.1);
 
       this.map.scale.set(scale, scale);

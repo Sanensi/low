@@ -10,6 +10,11 @@
     - OR
     - Bind each piece of ui to its game state representation, syncing it every time its associated object state is updated
 
+## Bugs
+
+- When canceling movement, the reachableHexes doesn't get updated
+- When moving a unit to the cell previously occupied by another unit, then chaos ensue
+
 ## Notes
 
 - When using PixiApplication.destroy, the application is broken apart by HMR
@@ -24,8 +29,3 @@ Rule of thumbs to remember the meaning of each value (flat-top hexes):
 - `q` becomes positive at 3 o'clock, negative at 9 o'clock
 - `r` becomes positive at 7 o'clock, negative at 1 o'clock
 - `s` becomes positive at 11 o'clock, negative at 5 o'clock
-
-## Bugs
-
-- When canceling movement, the reachableHexes doesn't get updated
-- When moving a unit to the cell previously occupied by another unit, then chaos ensue
