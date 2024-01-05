@@ -171,7 +171,7 @@ export class LoW extends PixiApplicationBase {
         this.createFarm();
         break;
       case "g":
-        this.growCity();
+        this._world.growCity();
         break;
     }
   }
@@ -201,27 +201,6 @@ export class LoW extends PixiApplicationBase {
       const unitDisplay = unitDisplays.get(villager) ?? throwError();
       unitDisplay.destroy();
       unitDisplays.delete(villager);
-    }
-  }
-
-  private growCity() {
-    const selectedNeighborCityHexesThatCanGrow =
-      this._world.selectedHex?.position
-        .neighbors()
-        .map((coord) => this.world.get(coord))
-        .filter(
-          (hex): hex is HexCity => hex instanceof HexCity && hex.canGrow(),
-        );
-
-    if (
-      (this._world.selectedHex instanceof HexField ||
-        this._world.selectedHex instanceof HexFarm) &&
-      selectedNeighborCityHexesThatCanGrow &&
-      selectedNeighborCityHexesThatCanGrow.length > 0
-    ) {
-      const cityHex = selectedNeighborCityHexesThatCanGrow[0];
-      const cityExtension = cityHex.grow(this._world.selectedHex);
-      this.world.set(this._world.selectedHex.position, cityExtension);
     }
   }
 

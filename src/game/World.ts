@@ -108,6 +108,24 @@ export class World {
     }
   }
 
+  growCity() {
+    const selectedNeighborCityHexesThatCanGrow = this.selectedHex?.position
+      .neighbors()
+      .map((coord) => this.map.get(coord))
+      .filter((hex): hex is HexCity => hex instanceof HexCity && hex.canGrow());
+
+    if (
+      (this.selectedHex instanceof HexField ||
+        this.selectedHex instanceof HexFarm) &&
+      selectedNeighborCityHexesThatCanGrow &&
+      selectedNeighborCityHexesThatCanGrow.length > 0
+    ) {
+      const cityHex = selectedNeighborCityHexesThatCanGrow[0];
+      const cityExtension = cityHex.grow(this.selectedHex);
+      this.map.set(this.selectedHex.position, cityExtension);
+    }
+  }
+
   private isGoingToBeOccupied(coord: HexCoordinate) {
     return this.map.values().some((hex) => {
       if (hex.unit?.plannedPath) {
