@@ -6,9 +6,9 @@ import { HexCoordinate } from "../lib/hex/HexCoordinate";
 import { drawHex, drawPlannedPath } from "./displays/HexDisplay";
 import { assert, throwError } from "../lib/Assertion";
 import { Unit, Villager } from "./Unit";
-import { findReachableHex, findShortestPath } from "./HexPaths";
+import { findShortestPath } from "./HexPaths";
 import { createUnitDisplay, drawUnit } from "./displays/UnitDisplay";
-import { World, applyPlannedMovements, isGoingToBeOccupied } from "./World";
+import { World, applyPlannedMovements } from "./World";
 import { deserialize } from "./HexMap";
 import defaultHexMap from "./maps/default-map.hex?raw";
 import { Vec2 } from "../lib/Vec2";
@@ -157,10 +157,10 @@ export class LoW extends PixiApplicationBase {
         this.createVillager();
         break;
       case "s":
-        this.selectUnit();
+        this._world.selectUnit();
         break;
       case "u":
-        this.unselectUnit();
+        this._world.unselectUnit();
         break;
       case "m":
         this.moveUnit();
@@ -198,29 +198,6 @@ export class LoW extends PixiApplicationBase {
       const unit = this._world.selectedHex.unit ?? throwError();
       const display = createUnitDisplay(unit);
       unitDisplays.set(unit, display);
-    }
-  }
-
-  private selectUnit() {
-    if (this._world.selectedHex?.unit) {
-      this._world.selectedUnit = this._world.selectedHex.unit;
-      const origin = this._world.selectedUnit.position;
-      this._world.reachableHexes = findReachableHex(
-        origin,
-        this._world.selectedHex.unit.movement,
-        this.world,
-      )
-        .filter((coord) => !origin.equals(coord))
-        .filter(
-          (reachableCoord) => !isGoingToBeOccupied(reachableCoord, this.world),
-        );
-    }
-  }
-
-  private unselectUnit() {
-    if (this._world.selectedUnit) {
-      this._world.selectedUnit = undefined;
-      this._world.reachableHexes = undefined;
     }
   }
 
