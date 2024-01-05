@@ -6,7 +6,6 @@ import { HexCoordinate } from "../lib/hex/HexCoordinate";
 import { drawHex, drawPlannedPath } from "./displays/HexDisplay";
 import { assert, throwError } from "../lib/Assertion";
 import { Unit, Villager } from "./Unit";
-import { findShortestPath } from "./HexPaths";
 import { createUnitDisplay, drawUnit } from "./displays/UnitDisplay";
 import { World } from "./World";
 import { deserialize } from "./HexMap";
@@ -163,7 +162,7 @@ export class LoW extends PixiApplicationBase {
         this._world.unselectUnit();
         break;
       case "m":
-        this.moveUnit();
+        this._world.moveUnit();
         break;
       case "f":
         this.createFarm();
@@ -195,26 +194,6 @@ export class LoW extends PixiApplicationBase {
       const unit = this._world.selectedHex.unit ?? throwError();
       const display = createUnitDisplay(unit);
       unitDisplays.set(unit, display);
-    }
-  }
-
-  private moveUnit() {
-    if (
-      this._world.selectedUnit &&
-      this._world.selectedHex &&
-      this._world.reachableHexes?.some((hex) =>
-        hex.equals(this._world.selectedHex?.position),
-      )
-    ) {
-      const { shortestPath } = findShortestPath(
-        this._world.selectedUnit.position,
-        this._world.selectedHex.position,
-        this.world,
-      );
-
-      this._world.selectedUnit.setPlannedPath(shortestPath);
-      this._world.selectedUnit = undefined;
-      this._world.reachableHexes = undefined;
     }
   }
 

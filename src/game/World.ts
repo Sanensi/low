@@ -2,7 +2,7 @@ import { assert, throwError } from "../lib/Assertion";
 import { HexCoordinate } from "../lib/hex/HexCoordinate";
 import { HexMap } from "../lib/hex/HexMap";
 import { Hex } from "./Hex";
-import { findReachableHex } from "./HexPaths";
+import { findReachableHex, findShortestPath } from "./HexPaths";
 import { Unit } from "./Unit";
 
 export class World {
@@ -50,6 +50,24 @@ export class World {
 
   unselectUnit() {
     if (this.selectedUnit) {
+      this.selectedUnit = undefined;
+      this.reachableHexes = undefined;
+    }
+  }
+
+  moveUnit() {
+    if (
+      this.selectedUnit &&
+      this.selectedHex &&
+      this.reachableHexes?.some((hex) => hex.equals(this.selectedHex?.position))
+    ) {
+      const { shortestPath } = findShortestPath(
+        this.selectedUnit.position,
+        this.selectedHex.position,
+        this.map,
+      );
+
+      this.selectedUnit.setPlannedPath(shortestPath);
       this.selectedUnit = undefined;
       this.reachableHexes = undefined;
     }
