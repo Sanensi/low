@@ -55,7 +55,7 @@ export class World {
     }
   }
 
-  moveUnit() {
+  moveSelectedUnit() {
     if (
       this.selectedUnit &&
       this.selectedHex &&
@@ -70,6 +70,12 @@ export class World {
       this.selectedUnit.setPlannedPath(shortestPath);
       this.selectedUnit = undefined;
       this.reachableHexes = undefined;
+    }
+  }
+
+  cancelSelectedUnitMovement() {
+    if (this.selectedUnit && this.selectedUnit.plannedPath) {
+      this.selectedUnit.clearPlannedPath();
     }
   }
 

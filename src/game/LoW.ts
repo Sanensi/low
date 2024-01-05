@@ -162,15 +162,13 @@ export class LoW extends PixiApplicationBase {
         this._world.unselectUnit();
         break;
       case "m":
-        this._world.moveUnit();
+        this._world.moveSelectedUnit();
+        break;
+      case "c":
+        this._world.cancelSelectedUnitMovement();
         break;
       case "f":
         this.createFarm();
-        break;
-      case "c":
-        if (this._world.selectedUnit && this._world.selectedUnit.plannedPath) {
-          this._world.selectedUnit.clearPlannedPath();
-        }
         break;
       case "g":
         this.growCity();
