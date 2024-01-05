@@ -20,6 +20,13 @@ export class World {
     this.map = hexMap;
   }
 
+  advanceToNextTurn() {
+    this.applyPlannedMovements();
+    this.map.values().forEach((hex) => hex.advanceToNextTurn());
+    this.selectedUnit = undefined;
+    this.reachableHexes = undefined;
+  }
+
   select(coord: HexCoordinate): asserts this is World & { selectedHex: Hex } {
     this.selectedHex?.unselect();
     this.selectedCoords = coord;
@@ -59,18 +66,18 @@ export class World {
       }
     });
   }
-}
 
-export function applyPlannedMovements(world: HexMap<Hex>) {
-  world.values().forEach((hex) => {
-    if (hex.unit?.plannedPath) {
-      const targetPosition =
-        hex.unit.plannedPath[hex.unit.plannedPath.length - 1];
-      const targetHex = world.get(targetPosition) ?? throwError();
-      targetHex.unit = hex.unit;
-      hex.unit.position = targetPosition;
-      hex.unit.clearPlannedPath();
-      hex.unit = undefined;
-    }
-  });
+  private applyPlannedMovements() {
+    this.map.values().forEach((hex) => {
+      if (hex.unit?.plannedPath) {
+        const targetPosition =
+          hex.unit.plannedPath[hex.unit.plannedPath.length - 1];
+        const targetHex = this.map.get(targetPosition) ?? throwError();
+        targetHex.unit = hex.unit;
+        hex.unit.position = targetPosition;
+        hex.unit.clearPlannedPath();
+        hex.unit = undefined;
+      }
+    });
+  }
 }

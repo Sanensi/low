@@ -8,7 +8,7 @@ import { assert, throwError } from "../lib/Assertion";
 import { Unit, Villager } from "./Unit";
 import { findShortestPath } from "./HexPaths";
 import { createUnitDisplay, drawUnit } from "./displays/UnitDisplay";
-import { World, applyPlannedMovements } from "./World";
+import { World } from "./World";
 import { deserialize } from "./HexMap";
 import defaultHexMap from "./maps/default-map.hex?raw";
 import { Vec2 } from "../lib/Vec2";
@@ -181,10 +181,7 @@ export class LoW extends PixiApplicationBase {
 
   private advanceToNextTurn() {
     this.currentTurn++;
-    applyPlannedMovements(this.world);
-    this.world.values().forEach((hex) => hex.advanceToNextTurn());
-    this._world.selectedUnit = undefined;
-    this._world.reachableHexes = undefined;
+    this._world.advanceToNextTurn();
 
     console.log("Current turn:", this.currentTurn);
   }
