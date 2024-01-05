@@ -2,6 +2,7 @@ import { assert, throwError } from "../lib/Assertion";
 import { HexCoordinate } from "../lib/hex/HexCoordinate";
 import { HexMap } from "../lib/hex/HexMap";
 import { Hex } from "./Hex";
+import { Unit } from "./Unit";
 
 export class World {
   private map = new HexMap<Hex>();
@@ -10,6 +11,9 @@ export class World {
   get selectedHex() {
     return this.map.get(this.selectedCoords);
   }
+
+  public selectedUnit?: Unit;
+  public reachableHexes?: HexCoordinate[];
 
   constructor(hexMap: HexMap<Hex>) {
     this.map = hexMap;

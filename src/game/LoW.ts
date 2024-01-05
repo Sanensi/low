@@ -29,9 +29,6 @@ export class LoW extends PixiApplicationBase {
   private initialMapPivotPosition?: Vec2;
   private initialMousePosition?: Vec2;
 
-  private selectedUnit?: Unit;
-  private reachableHexes?: HexCoordinate[];
-
   private map = new Container();
   private worldGraphics = worldGraphics;
 
@@ -105,21 +102,21 @@ export class LoW extends PixiApplicationBase {
       actionDescription.push("\t[s]: Select Unit");
     }
 
-    if (this.selectedUnit) {
+    if (this._world.selectedUnit) {
       actionDescription.push("\t[u]: Unselect Unit");
     }
 
     if (
-      this.selectedUnit &&
+      this._world.selectedUnit &&
       this._world.selectedHex &&
-      this.reachableHexes?.some((hex) =>
+      this._world.reachableHexes?.some((hex) =>
         hex.equals(this._world.selectedHex?.position),
       )
     ) {
       actionDescription.push("\t[m]: Move Unit");
     }
 
-    if (this.selectedUnit && this.selectedUnit.plannedPath) {
+    if (this._world.selectedUnit && this._world.selectedUnit.plannedPath) {
       actionDescription.push("\t[c]: Cancel Movement");
     }
 
@@ -172,8 +169,8 @@ export class LoW extends PixiApplicationBase {
         this.createFarm();
         break;
       case "c":
-        if (this.selectedUnit && this.selectedUnit.plannedPath) {
-          this.selectedUnit.clearPlannedPath();
+        if (this._world.selectedUnit && this._world.selectedUnit.plannedPath) {
+          this._world.selectedUnit.clearPlannedPath();
         }
         break;
       case "g":
@@ -186,8 +183,8 @@ export class LoW extends PixiApplicationBase {
     this.currentTurn++;
     applyPlannedMovements(this.world);
     this.world.values().forEach((hex) => hex.advanceToNextTurn());
-    this.selectedUnit = undefined;
-    this.reachableHexes = undefined;
+    this._world.selectedUnit = undefined;
+    this._world.reachableHexes = undefined;
 
     console.log("Current turn:", this.currentTurn);
   }
@@ -206,9 +203,9 @@ export class LoW extends PixiApplicationBase {
 
   private selectUnit() {
     if (this._world.selectedHex?.unit) {
-      this.selectedUnit = this._world.selectedHex.unit;
-      const origin = this.selectedUnit.position;
-      this.reachableHexes = findReachableHex(
+      this._world.selectedUnit = this._world.selectedHex.unit;
+      const origin = this._world.selectedUnit.position;
+      this._world.reachableHexes = findReachableHex(
         origin,
         this._world.selectedHex.unit.movement,
         this.world,
@@ -221,29 +218,29 @@ export class LoW extends PixiApplicationBase {
   }
 
   private unselectUnit() {
-    if (this.selectedUnit) {
-      this.selectedUnit = undefined;
-      this.reachableHexes = undefined;
+    if (this._world.selectedUnit) {
+      this._world.selectedUnit = undefined;
+      this._world.reachableHexes = undefined;
     }
   }
 
   private moveUnit() {
     if (
-      this.selectedUnit &&
+      this._world.selectedUnit &&
       this._world.selectedHex &&
-      this.reachableHexes?.some((hex) =>
+      this._world.reachableHexes?.some((hex) =>
         hex.equals(this._world.selectedHex?.position),
       )
     ) {
       const { shortestPath } = findShortestPath(
-        this.selectedUnit.position,
+        this._world.selectedUnit.position,
         this._world.selectedHex.position,
         this.world,
       );
 
-      this.selectedUnit.setPlannedPath(shortestPath);
-      this.selectedUnit = undefined;
-      this.reachableHexes = undefined;
+      this._world.selectedUnit.setPlannedPath(shortestPath);
+      this._world.selectedUnit = undefined;
+      this._world.reachableHexes = undefined;
     }
   }
 
@@ -312,7 +309,7 @@ export class LoW extends PixiApplicationBase {
 
       if (hex.unit) {
         const unitDisplay = unitDisplays.get(hex.unit) ?? throwError();
-        const isSelected = this.selectedUnit === hex.unit;
+        const isSelected = this._world.selectedUnit === hex.unit;
         drawUnit(unitDisplay, hexGraphic, isSelected);
       }
 
@@ -321,7 +318,7 @@ export class LoW extends PixiApplicationBase {
       }
     }
 
-    for (const coord of this.reachableHexes ?? []) {
+    for (const coord of this._world.reachableHexes ?? []) {
       const hexGraphic = this.worldGraphics.get(coord) ?? throwError();
       hexGraphic.alpha = 0.5;
     }
