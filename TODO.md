@@ -9,6 +9,7 @@
     - Make the ui states completly distinct from the game state and synchronize them on user actions
     - OR
     - Bind each piece of ui to its game state representation, syncing it every time its associated object state is updated
+- Setup github actions for unit tests
 
 ## Bugs
 
