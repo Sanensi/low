@@ -1,4 +1,4 @@
-import { throwError } from "../lib/Assertion";
+import { assert, throwError } from "../lib/Assertion";
 import { Comparer, Heap } from "../lib/Heap";
 import { HexCoordinate } from "../lib/hex/HexCoordinate";
 import { HexMap } from "../lib/hex/HexMap";
@@ -81,7 +81,17 @@ export function findShortestPath(
     }
   }
 
+  let currentHex = breadCrumbs.get(destination);
+  const shortestPath = [destination];
+  while (currentHex !== null) {
+    assert(currentHex);
+    shortestPath.push(currentHex);
+    currentHex = breadCrumbs.get(currentHex);
+  }
+  shortestPath.reverse();
+
   return {
+    shortestPath,
     breadCrumbs,
     stepToReach,
   };

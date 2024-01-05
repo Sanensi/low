@@ -238,22 +238,13 @@ export class LoW extends PixiApplicationBase {
       this.selectedCoords &&
       this.reachableHexes?.some((hex) => hex.equals(this.selectedCoords))
     ) {
-      const { breadCrumbs } = findShortestPath(
+      const { shortestPath } = findShortestPath(
         this.selectedUnit.position,
         this.selectedCoords,
         this.world,
       );
 
-      let currentHex = breadCrumbs.get(this.selectedCoords);
-      const path = [this.selectedCoords];
-      while (currentHex !== null) {
-        assert(currentHex);
-        path.push(currentHex);
-        currentHex = breadCrumbs.get(currentHex);
-      }
-      path.reverse();
-
-      this.selectedUnit.setPlannedPath(path);
+      this.selectedUnit.setPlannedPath(shortestPath);
       this.selectedUnit = undefined;
       this.reachableHexes = undefined;
     }
