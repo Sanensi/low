@@ -1,11 +1,11 @@
 import { Container, Graphics, Text } from "pixi.js";
 import { PixiApplicationBase } from "../lib/PixiApplicationBase";
 import { createWorldGraphics } from "./displays/WorldDisplay";
-import { Hex, HexCity, HexFarm, HexField } from "./Hex";
+import { HexCity, HexFarm, HexField } from "./Hex";
 import { HexCoordinate } from "../lib/hex/HexCoordinate";
 import { drawHex, drawPlannedPath } from "./displays/HexDisplay";
 import { assert, throwError } from "../lib/Assertion";
-import { Unit, Villager } from "./Unit";
+import { Unit } from "./Unit";
 import { createUnitDisplay, drawUnit } from "./displays/UnitDisplay";
 import { World } from "./World";
 import { deserialize } from "./HexMap";
@@ -64,10 +64,6 @@ export class LoW extends PixiApplicationBase {
 
   private onHexClick(coord: HexCoordinate) {
     this._world.select(coord);
-    const selectedHexNeighbors = this._world.selectedHex.position
-      .neighbors()
-      .map((coord) => this.world.get(coord))
-      .filter((hex): hex is Hex => hex !== undefined);
 
     if (this._world.selectedHex instanceof HexCity) {
       const lines = [
@@ -109,28 +105,15 @@ export class LoW extends PixiApplicationBase {
       actionDescription.push("\t[m]: Move Unit");
     }
 
-    if (this._world.selectedUnit && this._world.selectedUnit.plannedPath) {
+    if (this._world.canCancelSelectedUnitMovement()) {
       actionDescription.push("\t[c]: Cancel Movement");
     }
 
-    if (
-      this._world.selectedHex instanceof HexField &&
-      this._world.selectedHex.unit instanceof Villager &&
-      selectedHexNeighbors.some(
-        (neighbor) =>
-          neighbor instanceof HexCity || neighbor instanceof HexFarm,
-      )
-    ) {
+    if (this._world.canCreateFarm()) {
       actionDescription.push("\t[f]: Create Farm");
     }
 
-    if (
-      (this._world.selectedHex instanceof HexField ||
-        this._world.selectedHex instanceof HexFarm) &&
-      selectedHexNeighbors.some(
-        (neighbor) => neighbor instanceof HexCity && neighbor.canGrow(),
-      )
-    ) {
+    if (this._world.canGrowCity()) {
       actionDescription.push("\t[g]: Grow City (-25 food)");
     }
 

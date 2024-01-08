@@ -14,7 +14,7 @@
 
 ## Bugs
 
-- When canceling movement, the reachableHexes doesn't get updated
+- When canceling movement, the reachableHexes doesn't get updated ✅
 - When moving a unit to the cell previously occupied by another unit, then chaos ensue
 
 ## Notes

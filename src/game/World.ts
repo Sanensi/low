@@ -27,14 +27,14 @@ export class World {
     this.reachableHexes = undefined;
   }
 
-  select(coord: HexCoordinate): asserts this is World & { selectedHex: Hex } {
+  select(coord: HexCoordinate): asserts this is this & { selectedHex: Hex } {
     this.selectedHex?.unselect();
     this.selectedCoords = coord;
     this.selectedHex?.select();
     assert(this.selectedHex);
   }
 
-  canSelectUnit(): this is World & { selectedHex: Hex & { unit: Unit } } {
+  canSelectUnit(): this is this & { selectedHex: Hex & { unit: Unit } } {
     return !!this.selectedHex?.unit;
   }
 
@@ -63,7 +63,7 @@ export class World {
     }
   }
 
-  canMoveSelectedUnit(): this is World & {
+  canMoveSelectedUnit(): this is this & {
     selectedUnit: Unit;
     selectedHex: Hex;
   } {
@@ -88,14 +88,24 @@ export class World {
     }
   }
 
+  canCancelSelectedUnitMovement(): this is this & {
+    selectedUnit: Unit & { plannedPath: HexCoordinate[] };
+  } {
+    return !!(this.selectedUnit && this.selectedUnit.plannedPath);
+  }
+
   cancelSelectedUnitMovement() {
-    if (this.selectedUnit && this.selectedUnit.plannedPath) {
+    if (this.canCancelSelectedUnitMovement()) {
       this.selectedUnit.clearPlannedPath();
+      this.selectedUnit = undefined!;
+      this.reachableHexes = undefined;
     }
   }
 
-  createFarm() {
-    if (
+  canCreateFarm(): this is this & {
+    selectedHex: HexField & { unit: Villager };
+  } {
+    return (
       this.selectedHex instanceof HexField &&
       this.selectedHex.unit instanceof Villager &&
       this.selectedHex.position
@@ -105,7 +115,11 @@ export class World {
             this.map.get(neighbor) instanceof HexCity ||
             this.map.get(neighbor) instanceof HexFarm,
         )
-    ) {
+    );
+  }
+
+  createFarm() {
+    if (this.canCreateFarm()) {
       const hexField = this.selectedHex;
       const villager = this.selectedHex.unit;
       const neighbors = hexField.position
@@ -123,19 +137,26 @@ export class World {
     }
   }
 
-  growCity() {
-    const selectedNeighborCityHexesThatCanGrow = this.selectedHex?.position
-      .neighbors()
-      .map((coord) => this.map.get(coord))
-      .filter((hex): hex is HexCity => hex instanceof HexCity && hex.canGrow());
-
-    if (
+  canGrowCity(): this is this & { selectedHex: Hex } {
+    return (
       (this.selectedHex instanceof HexField ||
         this.selectedHex instanceof HexFarm) &&
-      selectedNeighborCityHexesThatCanGrow &&
-      selectedNeighborCityHexesThatCanGrow.length > 0
-    ) {
-      const cityHex = selectedNeighborCityHexesThatCanGrow[0];
+      this.selectedHex.position.neighbors().some((neighborCoord) => {
+        const neighborHex = this.map.get(neighborCoord);
+        return neighborHex instanceof HexCity && neighborHex.canGrow();
+      })
+    );
+  }
+
+  growCity() {
+    if (this.canGrowCity()) {
+      const neighborCityHexesThatCanGrow = this.selectedHex.position
+        .neighbors()
+        .map((coord) => this.map.get(coord))
+        .filter(
+          (hex): hex is HexCity => hex instanceof HexCity && hex.canGrow(),
+        );
+      const cityHex = neighborCityHexesThatCanGrow[0];
       const cityExtension = cityHex.grow(this.selectedHex);
       this.map.set(this.selectedHex.position, cityExtension);
     }
