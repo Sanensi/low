@@ -13,8 +13,15 @@ export class World implements Iterable<Hex> {
     return this.map.get(this.selectedCoords);
   }
 
-  selectedUnit?: Unit;
-  reachableHexes?: HexCoordinate[];
+  private _selectedUnit?: Unit;
+  get selectedUnit() {
+    return this._selectedUnit;
+  }
+
+  private _reachableHexes?: HexCoordinate[];
+  get reachableHexes() {
+    return this._reachableHexes;
+  }
 
   constructor(hexMap: HexMap<Hex>) {
     this.map = hexMap;
@@ -27,8 +34,8 @@ export class World implements Iterable<Hex> {
   advanceToNextTurn() {
     this.applyPlannedMovements();
     this.map.values().forEach((hex) => hex.advanceToNextTurn());
-    this.selectedUnit = undefined;
-    this.reachableHexes = undefined;
+    this._selectedUnit = undefined;
+    this._reachableHexes = undefined;
   }
 
   private applyPlannedMovements() {
@@ -58,9 +65,9 @@ export class World implements Iterable<Hex> {
 
   selectUnit() {
     if (this.canSelectUnit()) {
-      this.selectedUnit = this.selectedHex.unit;
-      const origin = this.selectedUnit.position;
-      this.reachableHexes = findReachableHex(
+      this._selectedUnit = this.selectedHex.unit;
+      const origin = this._selectedUnit.position;
+      this._reachableHexes = findReachableHex(
         origin,
         this.selectedHex.unit.movement,
         this.map,
@@ -83,13 +90,13 @@ export class World implements Iterable<Hex> {
   }
 
   canUnselectUnit() {
-    return !!this.selectedUnit;
+    return !!this._selectedUnit;
   }
 
   unselectUnit() {
     if (this.canUnselectUnit()) {
-      this.selectedUnit = undefined;
-      this.reachableHexes = undefined;
+      this._selectedUnit = undefined;
+      this._reachableHexes = undefined;
     }
   }
 
@@ -98,9 +105,11 @@ export class World implements Iterable<Hex> {
     selectedHex: Hex;
   } {
     return !!(
-      this.selectedUnit &&
+      this._selectedUnit &&
       this.selectedHex &&
-      this.reachableHexes?.some((hex) => hex.equals(this.selectedHex?.position))
+      this._reachableHexes?.some((hex) =>
+        hex.equals(this.selectedHex?.position),
+      )
     );
   }
 
@@ -113,22 +122,22 @@ export class World implements Iterable<Hex> {
       );
 
       this.selectedUnit.setPlannedPath(shortestPath);
-      this.selectedUnit = undefined!;
-      this.reachableHexes = undefined;
+      this._selectedUnit = undefined;
+      this._reachableHexes = undefined;
     }
   }
 
   canCancelSelectedUnitMovement(): this is this & {
     selectedUnit: Unit & { plannedPath: HexCoordinate[] };
   } {
-    return !!(this.selectedUnit && this.selectedUnit.plannedPath);
+    return !!(this._selectedUnit && this._selectedUnit.plannedPath);
   }
 
   cancelSelectedUnitMovement() {
     if (this.canCancelSelectedUnitMovement()) {
       this.selectedUnit.clearPlannedPath();
-      this.selectedUnit = undefined!;
-      this.reachableHexes = undefined;
+      this._selectedUnit = undefined;
+      this._reachableHexes = undefined;
     }
   }
 

@@ -1,6 +1,7 @@
 # TODO
 
 - Consider replacing javascript getter for functionnal getter defined in the base interface
+  - `this is this` typeguards are not playing nicely with wrapped getters
 - Refactor: Remove duplicate Unit selection state ✅
 - Refactor: Extract World altering logic out of LoW
 - Refactor: distinguish selection/highlight from base hex rendering
