@@ -5,7 +5,7 @@ import { Hex, HexCity, HexFarm, HexField } from "./Hex";
 import { findReachableHex, findShortestPath } from "./HexPaths";
 import { Unit, Villager } from "./Unit";
 
-export class World {
+export class World implements Iterable<Hex> {
   private map = new HexMap<Hex>();
 
   private selectedCoords?: HexCoordinate;
@@ -18,6 +18,10 @@ export class World {
 
   constructor(hexMap: HexMap<Hex>) {
     this.map = hexMap;
+  }
+
+  [Symbol.iterator](): IterableIterator<Hex> {
+    return this.map.values()[Symbol.iterator]();
   }
 
   advanceToNextTurn() {

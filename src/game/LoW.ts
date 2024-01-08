@@ -18,8 +18,7 @@ const pathGraphics = new Graphics();
 const unitDisplays = new Map<Unit, Text>();
 
 export class LoW extends PixiApplicationBase {
-  private _world: World = new World(world);
-  private world = world;
+  private world: World = new World(world);
   private currentTurn = 1;
 
   private highlightedCoords?: HexCoordinate;
@@ -63,22 +62,22 @@ export class LoW extends PixiApplicationBase {
   }
 
   private onHexClick(coord: HexCoordinate) {
-    this._world.select(coord);
+    this.world.select(coord);
 
-    if (this._world.selectedHex instanceof HexCity) {
+    if (this.world.selectedHex instanceof HexCity) {
       const lines = [
         "City:",
-        `\t(${this._world.selectedHex.food}/${this._world.selectedHex.foodCap}) Food (${this._world.selectedHex.foodBalance}/turn)`,
+        `\t(${this.world.selectedHex.food}/${this.world.selectedHex.foodCap}) Food (${this.world.selectedHex.foodBalance}/turn)`,
       ];
 
       console.log(lines.join("\n"));
     }
 
-    if (this._world.selectedHex instanceof HexField) {
+    if (this.world.selectedHex instanceof HexField) {
       console.log("Fields");
     }
 
-    if (this._world.selectedHex instanceof HexFarm) {
+    if (this.world.selectedHex instanceof HexFarm) {
       const lines = ["Farms:", `\t(+1 Food/turn)`];
 
       console.log(lines.join("\n"));
@@ -87,33 +86,33 @@ export class LoW extends PixiApplicationBase {
     const actionDescription = ["Actions:"];
 
     if (
-      this._world.selectedHex instanceof HexCity &&
-      this._world.selectedHex.canCreateVillager()
+      this.world.selectedHex instanceof HexCity &&
+      this.world.selectedHex.canCreateVillager()
     ) {
       actionDescription.push("\t[v]: Create Villager (-5 food)");
     }
 
-    if (this._world.canSelectUnit()) {
+    if (this.world.canSelectUnit()) {
       actionDescription.push("\t[s]: Select Unit");
     }
 
-    if (this._world.canUnselectUnit()) {
+    if (this.world.canUnselectUnit()) {
       actionDescription.push("\t[u]: Unselect Unit");
     }
 
-    if (this._world.canMoveSelectedUnit()) {
+    if (this.world.canMoveSelectedUnit()) {
       actionDescription.push("\t[m]: Move Unit");
     }
 
-    if (this._world.canCancelSelectedUnitMovement()) {
+    if (this.world.canCancelSelectedUnitMovement()) {
       actionDescription.push("\t[c]: Cancel Movement");
     }
 
-    if (this._world.canCreateFarm()) {
+    if (this.world.canCreateFarm()) {
       actionDescription.push("\t[f]: Create Farm");
     }
 
-    if (this._world.canGrowCity()) {
+    if (this.world.canGrowCity()) {
       actionDescription.push("\t[g]: Grow City (-25 food)");
     }
 
@@ -133,47 +132,47 @@ export class LoW extends PixiApplicationBase {
         this.createVillager();
         break;
       case "s":
-        this._world.selectUnit();
+        this.world.selectUnit();
         break;
       case "u":
-        this._world.unselectUnit();
+        this.world.unselectUnit();
         break;
       case "m":
-        this._world.moveSelectedUnit();
+        this.world.moveSelectedUnit();
         break;
       case "c":
-        this._world.cancelSelectedUnitMovement();
+        this.world.cancelSelectedUnitMovement();
         break;
       case "f":
         this.createFarm();
         break;
       case "g":
-        this._world.growCity();
+        this.world.growCity();
         break;
     }
   }
 
   private advanceToNextTurn() {
     this.currentTurn++;
-    this._world.advanceToNextTurn();
+    this.world.advanceToNextTurn();
 
     console.log("Current turn:", this.currentTurn);
   }
 
   private createVillager() {
     if (
-      this._world.selectedHex instanceof HexCity &&
-      this._world.selectedHex.canCreateVillager()
+      this.world.selectedHex instanceof HexCity &&
+      this.world.selectedHex.canCreateVillager()
     ) {
-      this._world.selectedHex.createVillager();
-      const unit = this._world.selectedHex.unit ?? throwError();
+      this.world.selectedHex.createVillager();
+      const unit = this.world.selectedHex.unit ?? throwError();
       const display = createUnitDisplay(unit);
       unitDisplays.set(unit, display);
     }
   }
 
   private createFarm() {
-    const villager = this._world.createFarm();
+    const villager = this.world.createFarm();
     if (villager) {
       const unitDisplay = unitDisplays.get(villager) ?? throwError();
       unitDisplay.destroy();
@@ -184,13 +183,13 @@ export class LoW extends PixiApplicationBase {
   protected update(): void {
     pathGraphics.clear();
 
-    for (const hex of this.world.values()) {
+    for (const hex of this.world) {
       const hexGraphic = this.worldGraphics.get(hex.position) ?? throwError();
       drawHex(hex, hexGraphic);
 
       if (hex.unit) {
         const unitDisplay = unitDisplays.get(hex.unit) ?? throwError();
-        const isSelected = this._world.selectedUnit === hex.unit;
+        const isSelected = this.world.selectedUnit === hex.unit;
         drawUnit(unitDisplay, hexGraphic, isSelected);
       }
 
@@ -199,7 +198,7 @@ export class LoW extends PixiApplicationBase {
       }
     }
 
-    for (const coord of this._world.reachableHexes ?? []) {
+    for (const coord of this.world.reachableHexes ?? []) {
       const hexGraphic = this.worldGraphics.get(coord) ?? throwError();
       hexGraphic.alpha = 0.5;
     }
