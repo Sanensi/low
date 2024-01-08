@@ -31,6 +31,20 @@ export class World implements Iterable<Hex> {
     this.reachableHexes = undefined;
   }
 
+  private applyPlannedMovements() {
+    this.map.values().forEach((hex) => {
+      if (hex.unit?.plannedPath) {
+        const targetPosition =
+          hex.unit.plannedPath[hex.unit.plannedPath.length - 1];
+        const targetHex = this.map.get(targetPosition) ?? throwError();
+        targetHex.unit = hex.unit;
+        hex.unit.position = targetPosition;
+        hex.unit.clearPlannedPath();
+        hex.unit = undefined;
+      }
+    });
+  }
+
   select(coord: HexCoordinate): asserts this is this & { selectedHex: Hex } {
     this.selectedHex?.unselect();
     this.selectedCoords = coord;
@@ -54,6 +68,18 @@ export class World implements Iterable<Hex> {
         .filter((coord) => !origin.equals(coord))
         .filter((reachableCoord) => !this.isGoingToBeOccupied(reachableCoord));
     }
+  }
+
+  private isGoingToBeOccupied(coord: HexCoordinate) {
+    return this.map.values().some((hex) => {
+      if (hex.unit?.plannedPath) {
+        const destination =
+          hex.unit.plannedPath[hex.unit.plannedPath.length - 1];
+        return coord.equals(destination);
+      } else {
+        return coord.equals(hex.unit?.position);
+      }
+    });
   }
 
   canUnselectUnit() {
@@ -164,31 +190,5 @@ export class World implements Iterable<Hex> {
       const cityExtension = cityHex.grow(this.selectedHex);
       this.map.set(this.selectedHex.position, cityExtension);
     }
-  }
-
-  private isGoingToBeOccupied(coord: HexCoordinate) {
-    return this.map.values().some((hex) => {
-      if (hex.unit?.plannedPath) {
-        const destination =
-          hex.unit.plannedPath[hex.unit.plannedPath.length - 1];
-        return coord.equals(destination);
-      } else {
-        return coord.equals(hex.unit?.position);
-      }
-    });
-  }
-
-  private applyPlannedMovements() {
-    this.map.values().forEach((hex) => {
-      if (hex.unit?.plannedPath) {
-        const targetPosition =
-          hex.unit.plannedPath[hex.unit.plannedPath.length - 1];
-        const targetHex = this.map.get(targetPosition) ?? throwError();
-        targetHex.unit = hex.unit;
-        hex.unit.position = targetPosition;
-        hex.unit.clearPlannedPath();
-        hex.unit = undefined;
-      }
-    });
   }
 }
