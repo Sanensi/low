@@ -22,22 +22,9 @@ export abstract class Hex implements Traversable {
     this._unit = unit;
   }
 
-  protected _isSelected = false;
-  get isSelected() {
-    return this._isSelected;
-  }
-
   constructor(readonly position: HexCoordinate) {}
 
   abstract advanceToNextTurn(): void;
-
-  select(): void {
-    this._isSelected = true;
-  }
-
-  unselect(): void {
-    this._isSelected = false;
-  }
 }
 
 export class HexField extends Hex {

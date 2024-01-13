@@ -53,9 +53,7 @@ export class World implements Iterable<Hex> {
   }
 
   select(coord: HexCoordinate): asserts this is this & { selectedHex: Hex } {
-    this.selectedHex?.unselect();
     this.selectedCoords = coord;
-    this.selectedHex?.select();
     assert(this.selectedHex);
   }
 

@@ -3,7 +3,7 @@
 - Consider replacing javascript getter for functionnal getter defined in the base interface
   - `this is this` typeguards are not playing nicely with wrapped getters
 - Refactor: Remove duplicate Unit selection state ✅
-- Refactor: Extract World altering logic out of LoW
+- Refactor: Extract World altering logic out of LoW ✅
 - Refactor: distinguish selection/highlight from base hex rendering
   - To do so, use distinct hex graphics for each rendered element
 - Refactor: Render changes to hex display only after the user interact with the game instead of every frames

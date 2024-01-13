@@ -3,6 +3,7 @@ import { Vec2 } from "../../lib/Vec2";
 import { Hex, HexField, HexCity, HexWater, HexFarm } from "../Hex";
 import { HexCoordinate } from "../../lib/hex/HexCoordinate";
 import { pointyHexToPixel } from "../../lib/hex/HexCoordinatesConversion";
+import { World } from "../World";
 
 export const SCALE = Vec2.ONE.scale(100);
 const VERTICES = Array.from({ length: 6 }, (_, i) =>
@@ -16,9 +17,11 @@ type HexAttributes = {
   zIndex: number;
 };
 
-export function drawHex(hex: Hex, hexGraphics: Graphics) {
-  const { fillColor, strokeColor, strokeWidth, zIndex } =
-    mapHexToAttributes(hex);
+export function drawHex(hex: Hex, world: World, hexGraphics: Graphics) {
+  const { fillColor, strokeColor, strokeWidth, zIndex } = mapHexToAttributes(
+    hex,
+    world,
+  );
 
   hexGraphics.alpha = 1;
   hexGraphics.tint = 0xffffff;
@@ -34,7 +37,7 @@ export function drawHex(hex: Hex, hexGraphics: Graphics) {
   hexGraphics.zIndex = zIndex;
 }
 
-function mapHexToAttributes(hex: Hex): HexAttributes {
+function mapHexToAttributes(hex: Hex, world: World): HexAttributes {
   const attributes: HexAttributes = {
     fillColor: 0xffffff,
     strokeColor: 0x000000,
@@ -60,7 +63,7 @@ function mapHexToAttributes(hex: Hex): HexAttributes {
     attributes.fillColor = 0xf5deb3;
   }
 
-  if (hex.isSelected) {
+  if (world.selectedHex === hex) {
     attributes.strokeColor = 0x00ffff;
     attributes.zIndex = 2;
   }

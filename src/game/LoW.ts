@@ -185,7 +185,7 @@ export class LoW extends PixiApplicationBase {
 
     for (const hex of this.world) {
       const hexGraphic = this.worldGraphics.get(hex.position) ?? throwError();
-      drawHex(hex, hexGraphic);
+      drawHex(hex, this.world, hexGraphic);
 
       if (hex.unit) {
         const unitDisplay = unitDisplays.get(hex.unit) ?? throwError();
