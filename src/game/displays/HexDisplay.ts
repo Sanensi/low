@@ -10,6 +10,24 @@ const VERTICES = Array.from({ length: 6 }, (_, i) =>
   pointyHexCorner(Vec2.ZERO, SCALE, i),
 );
 
+function flatHexCorner(center: Vec2, scale: Vec2, i: number) {
+  const angleDeg = 60 * i;
+  const angleRad = (Math.PI / 180) * angleDeg;
+  return new Vec2(
+    center.x + scale.x * Math.cos(angleRad),
+    center.y + scale.y * Math.sin(angleRad),
+  );
+}
+
+function pointyHexCorner(center: Vec2, scale: Vec2, i: number) {
+  const angle_deg = 60 * i - 30;
+  const angle_rad = (Math.PI / 180) * angle_deg;
+  return new Vec2(
+    center.x + scale.x * Math.cos(angle_rad),
+    center.y + scale.y * Math.sin(angle_rad),
+  );
+}
+
 type HexAttributes = {
   fillColor: number;
   strokeColor: number;
@@ -69,24 +87,6 @@ function mapHexToAttributes(hex: Hex, world: World): HexAttributes {
   }
 
   return attributes;
-}
-
-function flatHexCorner(center: Vec2, scale: Vec2, i: number) {
-  const angleDeg = 60 * i;
-  const angleRad = (Math.PI / 180) * angleDeg;
-  return new Vec2(
-    center.x + scale.x * Math.cos(angleRad),
-    center.y + scale.y * Math.sin(angleRad),
-  );
-}
-
-function pointyHexCorner(center: Vec2, scale: Vec2, i: number) {
-  const angle_deg = 60 * i - 30;
-  const angle_rad = (Math.PI / 180) * angle_deg;
-  return new Vec2(
-    center.x + scale.x * Math.cos(angle_rad),
-    center.y + scale.y * Math.sin(angle_rad),
-  );
 }
 
 export function drawPlannedPath(path: HexCoordinate[], pathGraphics: Graphics) {
