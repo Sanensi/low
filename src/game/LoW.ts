@@ -3,7 +3,12 @@ import { PixiApplicationBase } from "../lib/PixiApplicationBase";
 import { createWorldGraphics } from "./displays/WorldDisplay";
 import { HexCity, HexFarm, HexField } from "./Hex";
 import { HexCoordinate } from "../lib/hex/HexCoordinate";
-import { drawHex, drawPlannedPath } from "./displays/HexDisplay";
+import {
+  HexAttributes,
+  drawHex,
+  drawHexes,
+  drawPlannedPath,
+} from "./displays/HexDisplay";
 import { assert, throwError } from "../lib/Assertion";
 import { Unit } from "./Unit";
 import { createUnitDisplay, drawUnit } from "./displays/UnitDisplay";
@@ -15,6 +20,7 @@ import { Vec2 } from "../lib/Vec2";
 const world = deserialize(defaultHexMap);
 const worldGraphics = createWorldGraphics(world.keys());
 const pathGraphics = new Graphics();
+const cityBorderHighlightGraphics = new Graphics();
 const unitDisplays = new Map<Unit, Text>();
 
 export class LoW extends PixiApplicationBase {
@@ -51,6 +57,7 @@ export class LoW extends PixiApplicationBase {
     }
 
     this.map.addChild(pathGraphics);
+    this.map.addChild(cityBorderHighlightGraphics);
 
     this.map.sortableChildren = true;
     this.map.scale.set(0.2);
@@ -207,6 +214,20 @@ export class LoW extends PixiApplicationBase {
       const hexGraphic =
         this.worldGraphics.get(this.highlightedCoords) ?? throwError();
       hexGraphic.tint = 0xc0c0c0;
+    }
+
+    if (this.world.selectedHex instanceof HexCity) {
+      const border = this.world.selectedHex.getBorder();
+      const attributes: HexAttributes = {
+        alpha: 0.25,
+        fillColor: 0x0000ff,
+        strokeColor: 0x000000,
+        strokeWidth: 0,
+        zIndex: 10,
+      };
+      drawHexes(border, attributes, cityBorderHighlightGraphics);
+    } else {
+      cityBorderHighlightGraphics.clear();
     }
   }
 

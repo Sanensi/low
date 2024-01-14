@@ -28,20 +28,27 @@ function pointyHexCorner(center: Vec2, scale: Vec2, i: number) {
   );
 }
 
-type HexAttributes = {
+export type HexAttributes = {
+  alpha: number;
   fillColor: number;
   strokeColor: number;
   strokeWidth: number;
   zIndex: number;
 };
 
-export function drawHex(hex: Hex, world: World, hexGraphics: Graphics) {
-  const { fillColor, strokeColor, strokeWidth, zIndex } = mapHexToAttributes(
-    hex,
-    world,
-  );
+const defaultHexAttributes: Readonly<HexAttributes> = {
+  alpha: 1,
+  fillColor: 0xffffff,
+  strokeColor: 0x000000,
+  strokeWidth: 10,
+  zIndex: 1,
+};
 
-  hexGraphics.alpha = 1;
+export function drawHex(hex: Hex, world: World, hexGraphics: Graphics) {
+  const { alpha, fillColor, strokeColor, strokeWidth, zIndex } =
+    mapHexToAttributes(hex, world);
+
+  hexGraphics.alpha = alpha;
   hexGraphics.tint = 0xffffff;
   hexGraphics.clear();
   hexGraphics.beginFill(fillColor);
@@ -56,12 +63,7 @@ export function drawHex(hex: Hex, world: World, hexGraphics: Graphics) {
 }
 
 function mapHexToAttributes(hex: Hex, world: World): HexAttributes {
-  const attributes: HexAttributes = {
-    fillColor: 0xffffff,
-    strokeColor: 0x000000,
-    strokeWidth: 10,
-    zIndex: 1,
-  };
+  const attributes = { ...defaultHexAttributes };
 
   if (hex instanceof HexField) {
     attributes.fillColor = 0x00c040;
@@ -105,4 +107,33 @@ export function drawPlannedPath(path: HexCoordinate[], pathGraphics: Graphics) {
     pathGraphics.lineTo(p.x, p.y);
   }
   pathGraphics.endFill();
+}
+
+export function drawHexes(
+  hexes: HexCoordinate[],
+  attributes: HexAttributes,
+  graphics: Graphics,
+) {
+  graphics.alpha = attributes.alpha;
+  graphics.tint = 0xffffff;
+  graphics.zIndex = attributes.zIndex;
+  graphics.clear();
+
+  for (const hex of hexes) {
+    const verticesPrime = VERTICES.map((v) =>
+      v.add(pointyHexToPixel(hex, SCALE)),
+    );
+
+    graphics.beginFill(attributes.fillColor);
+    graphics.lineStyle({
+      width: attributes.strokeWidth,
+      color: attributes.strokeColor,
+    });
+    graphics.moveTo(verticesPrime[0].x, verticesPrime[0].y);
+    for (let i = 0; i < verticesPrime.length + 2; i++) {
+      const vertice = verticesPrime[i % verticesPrime.length];
+      graphics.lineTo(vertice.x, vertice.y);
+    }
+    graphics.endFill();
+  }
 }

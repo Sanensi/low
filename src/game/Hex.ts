@@ -1,5 +1,6 @@
 import { assert } from "../lib/Assertion";
 import { HexCoordinate } from "../lib/hex/HexCoordinate";
+import { createArea } from "../lib/hex/HexCoordinatesFactory";
 import { Traversable } from "./HexPaths";
 import { Unit, Villager } from "./Unit";
 
@@ -111,6 +112,10 @@ export class HexCity extends Hex {
     }
 
     return hexCity;
+  }
+
+  getBorder() {
+    return createArea(3, this.position);
   }
 }
 
