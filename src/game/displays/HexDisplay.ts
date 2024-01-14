@@ -1,6 +1,13 @@
 import { Graphics, LINE_CAP } from "pixi.js";
 import { Vec2 } from "../../lib/Vec2";
-import { Hex, HexField, HexCity, HexWater, HexFarm } from "../Hex";
+import {
+  Hex,
+  HexField,
+  HexCity,
+  HexWater,
+  HexFarm,
+  HexSettlement,
+} from "../Hex";
 import { HexCoordinate } from "../../lib/hex/HexCoordinate";
 import { pointyHexToPixel } from "../../lib/hex/HexCoordinatesConversion";
 import { World } from "../World";
@@ -81,6 +88,10 @@ function mapHexToAttributes(hex: Hex, world: World): HexAttributes {
 
   if (hex instanceof HexFarm) {
     attributes.fillColor = 0xf5deb3;
+  }
+
+  if (hex instanceof HexSettlement) {
+    attributes.fillColor = 0xc0c0c0;
   }
 
   if (world.selectedHex === hex) {

@@ -1,7 +1,7 @@
 import { Container, Graphics, Text } from "pixi.js";
 import { PixiApplicationBase } from "../lib/PixiApplicationBase";
 import { createWorldGraphics } from "./displays/WorldDisplay";
-import { HexCity, HexFarm, HexField } from "./Hex";
+import { HexCity, HexFarm, HexField, HexSettlement } from "./Hex";
 import { HexCoordinate } from "../lib/hex/HexCoordinate";
 import {
   HexAttributes,
@@ -90,6 +90,12 @@ export class LoW extends PixiApplicationBase {
       console.log(lines.join("\n"));
     }
 
+    if (this.world.selectedHex instanceof HexSettlement) {
+      const lines = ["Settlement:", `\t(1/5) Villagers to upgrade to City`];
+
+      console.log(lines.join("\n"));
+    }
+
     const actionDescription = ["Actions:"];
 
     if (
@@ -123,8 +129,8 @@ export class LoW extends PixiApplicationBase {
       actionDescription.push("\t[g]: Grow City (-25 food)");
     }
 
-    if (this.world.canFoundNewCity()) {
-      actionDescription.push("\t[n]: Found New City");
+    if (this.world.canFoundNewSettlement()) {
+      actionDescription.push("\t[n]: Found New Settlement");
     }
 
     if (actionDescription.length === 1) {
@@ -160,6 +166,9 @@ export class LoW extends PixiApplicationBase {
       case "g":
         this.world.growCity();
         break;
+      case "n":
+        this.foundNewSettlement();
+        break;
     }
   }
 
@@ -184,6 +193,15 @@ export class LoW extends PixiApplicationBase {
 
   private createFarm() {
     const villager = this.world.createFarm();
+    if (villager) {
+      const unitDisplay = unitDisplays.get(villager) ?? throwError();
+      unitDisplay.destroy();
+      unitDisplays.delete(villager);
+    }
+  }
+
+  private foundNewSettlement() {
+    const villager = this.world.foundNewSettlement();
     if (villager) {
       const unitDisplay = unitDisplays.get(villager) ?? throwError();
       unitDisplay.destroy();

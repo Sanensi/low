@@ -149,6 +149,10 @@ export class HexCity extends Hex {
   }
 }
 
+export class HexSettlement extends Hex {
+  advanceToNextTurn = noop;
+}
+
 export class HexFarm extends Hex {
   advanceToNextTurn = noop;
 

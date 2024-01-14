@@ -1,7 +1,7 @@
 import { assert, throwError } from "../lib/Assertion";
 import { HexCoordinate } from "../lib/hex/HexCoordinate";
 import { HexMap } from "../lib/hex/HexMap";
-import { Hex, HexCity, HexFarm, HexField } from "./Hex";
+import { Hex, HexCity, HexFarm, HexField, HexSettlement } from "./Hex";
 import { findReachableHex, findShortestPath } from "./HexPaths";
 import { Unit, Villager } from "./Unit";
 
@@ -203,7 +203,9 @@ export class World implements Iterable<Hex> {
     }
   }
 
-  canFoundNewCity() {
+  canFoundNewSettlement(): this is this & {
+    selectedHex: HexField & { unit: Villager };
+  } {
     const existingCityBorders = this.map
       .values()
       .filter((hex): hex is HexCity => hex instanceof HexCity)
@@ -214,9 +216,19 @@ export class World implements Iterable<Hex> {
     );
 
     return (
-      this.selectedHex &&
+      this.selectedHex instanceof HexField &&
       this.selectedHex.unit instanceof Villager &&
       selectedHexOutsideExistingCityBorder
     );
+  }
+
+  foundNewSettlement() {
+    if (this.canFoundNewSettlement()) {
+      const villager = this.selectedHex.unit;
+      const hexFarm = new HexSettlement(this.selectedHex.position);
+      this.map.set(hexFarm.position, hexFarm);
+
+      return villager;
+    }
   }
 }
