@@ -174,6 +174,7 @@ export class World implements Iterable<Hex> {
 
       const hexFarm = new HexFarm(this.selectedHex.position, neighborCity);
       this.map.set(hexFarm.position, hexFarm);
+      hexField.unit = undefined!;
 
       return villager;
     }
@@ -228,23 +229,48 @@ export class World implements Iterable<Hex> {
 
   foundNewSettlement() {
     if (this.canFoundNewSettlement()) {
+      const hexFields = this.selectedHex;
       const villager = this.selectedHex.unit;
-      const hexFarm = new HexSettlement(this.selectedHex.position);
-      this.map.set(hexFarm.position, hexFarm);
+      const settlement = new HexSettlement(this.selectedHex.position);
+      this.map.set(settlement.position, settlement);
+      hexFields.unit = undefined!;
 
       return villager;
     }
   }
 
-  canJoinSettlement() {
+  canJoinSettlement(): this is this & {
+    selectedHex: Hex & { unit: Villager };
+  } {
     const isOnSettlement = this.selectedHex instanceof HexSettlement;
     const isNextToSettlement = this.selectedHex?.position
       .neighbors()
       .some((coord) => this.map.get(coord) instanceof HexSettlement);
 
-    return (
-      this.selectedHex?.unit instanceof Villager &&
+    return !!(
+      this.selectedHex &&
+      this.selectedHex.unit instanceof Villager &&
       (isOnSettlement || isNextToSettlement)
     );
+  }
+
+  joinSettlement() {
+    if (this.canJoinSettlement()) {
+      const villagerHex = this.selectedHex;
+      const villager = this.selectedHex.unit;
+      const settlement =
+        this.selectedHex instanceof HexSettlement
+          ? this.selectedHex
+          : this.selectedHex.position
+              .neighbors()
+              .map((coord) => this.map.get(coord))
+              .filter(
+                (hex): hex is HexSettlement => hex instanceof HexSettlement,
+              )[0];
+      settlement.addVillager();
+      villagerHex.unit = undefined!;
+
+      return villager;
+    }
   }
 }

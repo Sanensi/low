@@ -92,7 +92,10 @@ export class LoW extends PixiApplicationBase {
     }
 
     if (this.world.selectedHex instanceof HexSettlement) {
-      const lines = ["Settlement:", `\t(1/5) Villagers to upgrade to City`];
+      const lines = [
+        "Settlement:",
+        `\t(${this.world.selectedHex.population}/5) Villagers to upgrade to City`,
+      ];
 
       console.log(lines.join("\n"));
     }
@@ -174,6 +177,9 @@ export class LoW extends PixiApplicationBase {
       case "n":
         this.foundNewSettlement();
         break;
+      case "j":
+        this.joinSettlement();
+        break;
     }
   }
 
@@ -207,6 +213,15 @@ export class LoW extends PixiApplicationBase {
 
   private foundNewSettlement() {
     const villager = this.world.foundNewSettlement();
+    if (villager) {
+      const unitDisplay = unitDisplays.get(villager) ?? throwError();
+      unitDisplay.destroy();
+      unitDisplays.delete(villager);
+    }
+  }
+
+  private joinSettlement() {
+    const villager = this.world.joinSettlement();
     if (villager) {
       const unitDisplay = unitDisplays.get(villager) ?? throwError();
       unitDisplay.destroy();

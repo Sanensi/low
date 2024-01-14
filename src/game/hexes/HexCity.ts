@@ -124,12 +124,22 @@ export class HexCity extends Hex {
 }
 
 export class HexSettlement extends Hex {
+  private _population = 1;
+
+  public get population() {
+    return this._population;
+  }
+
   advanceToNextTurn = noop;
 
   getBorder(world: World) {
     return createArea(CITY_BORDER_RADIUS, this.position).filter((hex) =>
       world.has(hex),
     );
+  }
+
+  addVillager() {
+    this._population++;
   }
 }
 
