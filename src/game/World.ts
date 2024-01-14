@@ -202,4 +202,21 @@ export class World implements Iterable<Hex> {
       this.map.set(this.selectedHex.position, cityExtension);
     }
   }
+
+  canFoundNewCity() {
+    const existingCityBorders = this.map
+      .values()
+      .filter((hex): hex is HexCity => hex instanceof HexCity)
+      .flatMap((city) => city.getBorder(this));
+
+    const selectedHexOutsideExistingCityBorder = !existingCityBorders.some(
+      (hex) => hex.equals(this.selectedHex?.position),
+    );
+
+    return (
+      this.selectedHex &&
+      this.selectedHex.unit instanceof Villager &&
+      selectedHexOutsideExistingCityBorder
+    );
+  }
 }

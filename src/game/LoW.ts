@@ -123,6 +123,10 @@ export class LoW extends PixiApplicationBase {
       actionDescription.push("\t[g]: Grow City (-25 food)");
     }
 
+    if (this.world.canFoundNewCity()) {
+      actionDescription.push("\t[n]: Found New City");
+    }
+
     if (actionDescription.length === 1) {
       actionDescription.push("\tNo action available");
     }
