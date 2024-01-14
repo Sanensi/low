@@ -5,7 +5,8 @@ import {
   hexToDoubleWidthCoordinates,
 } from "../lib/hex/HexCoordinatesConversion";
 import { HexMap } from "../lib/hex/HexMap";
-import { Hex, HexCity, HexField, HexWater } from "./hexes/Hex";
+import { Hex, HexField, HexWater } from "./hexes/Hex";
+import { HexCity } from "./hexes/HexCity";
 
 export function serialize(map: HexMap<Hex>) {
   const coords = map

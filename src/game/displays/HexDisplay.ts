@@ -1,16 +1,10 @@
 import { Graphics, LINE_CAP } from "pixi.js";
 import { Vec2 } from "../../lib/Vec2";
-import {
-  Hex,
-  HexField,
-  HexCity,
-  HexWater,
-  HexFarm,
-  HexSettlement,
-} from "../hexes/Hex";
+import { Hex, HexFarm, HexField, HexWater } from "../hexes/Hex";
 import { HexCoordinate } from "../../lib/hex/HexCoordinate";
 import { pointyHexToPixel } from "../../lib/hex/HexCoordinatesConversion";
 import { World } from "../World";
+import { HexCity, HexSettlement } from "../hexes/HexCity";
 
 export const SCALE = Vec2.ONE.scale(100);
 const VERTICES = Array.from({ length: 6 }, (_, i) =>

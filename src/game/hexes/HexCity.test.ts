@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
 import { HexCoordinate } from "../../lib/hex/HexCoordinate";
-import { HexCity } from "./Hex";
+import { HexCity } from "./HexCity";
 import { Villager } from "../Unit";
 
 describe("HexCity", () => {

@@ -1,7 +1,7 @@
 import { Container, Graphics, Text } from "pixi.js";
 import { PixiApplicationBase } from "../lib/PixiApplicationBase";
 import { createWorldGraphics } from "./displays/WorldDisplay";
-import { HexCity, HexFarm, HexField, HexSettlement } from "./hexes/Hex";
+import { HexFarm, HexField } from "./hexes/Hex";
 import { HexCoordinate } from "../lib/hex/HexCoordinate";
 import {
   HexAttributes,
@@ -16,6 +16,7 @@ import { World } from "./World";
 import { deserialize } from "./MapSerialization";
 import defaultHexMap from "./maps/default-map.hex?raw";
 import { Vec2 } from "../lib/Vec2";
+import { HexCity, HexSettlement } from "./hexes/HexCity";
 
 const world = deserialize(defaultHexMap);
 const worldGraphics = createWorldGraphics(world.keys());

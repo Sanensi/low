@@ -1,7 +1,8 @@
 import { assert, throwError } from "../lib/Assertion";
 import { HexCoordinate } from "../lib/hex/HexCoordinate";
 import { HexMap } from "../lib/hex/HexMap";
-import { Hex, HexCity, HexFarm, HexField, HexSettlement } from "./hexes/Hex";
+import { Hex, HexFarm, HexField } from "./hexes/Hex";
+import { HexCity, HexSettlement } from "./hexes/HexCity";
 import { findReachableHex, findShortestPath } from "./HexPaths";
 import { Unit, Villager } from "./Unit";
 
