@@ -209,7 +209,10 @@ export class World implements Iterable<Hex> {
   } {
     const existingCityBorders = this.map
       .values()
-      .filter((hex): hex is HexCity => hex instanceof HexCity)
+      .filter(
+        (hex): hex is HexCity | HexSettlement =>
+          hex instanceof HexCity || hex instanceof HexSettlement,
+      )
       .flatMap((city) => city.getBorder(this));
 
     const selectedHexOutsideExistingCityBorder = !existingCityBorders.some(
@@ -231,5 +234,17 @@ export class World implements Iterable<Hex> {
 
       return villager;
     }
+  }
+
+  canJoinSettlement() {
+    const isOnSettlement = this.selectedHex instanceof HexSettlement;
+    const isNextToSettlement = this.selectedHex?.position
+      .neighbors()
+      .some((coord) => this.map.get(coord) instanceof HexSettlement);
+
+    return (
+      this.selectedHex?.unit instanceof Villager &&
+      (isOnSettlement || isNextToSettlement)
+    );
   }
 }

@@ -134,6 +134,10 @@ export class LoW extends PixiApplicationBase {
       actionDescription.push("\t[n]: Found New Settlement");
     }
 
+    if (this.world.canJoinSettlement()) {
+      actionDescription.push("\t[j]: Join Settlement");
+    }
+
     if (actionDescription.length === 1) {
       actionDescription.push("\tNo action available");
     }
@@ -239,7 +243,10 @@ export class LoW extends PixiApplicationBase {
       hexGraphic.tint = 0xc0c0c0;
     }
 
-    if (this.world.selectedHex instanceof HexCity) {
+    if (
+      this.world.selectedHex instanceof HexCity ||
+      this.world.selectedHex instanceof HexSettlement
+    ) {
       const border = this.world.selectedHex.getBorder(this.world);
       const attributes: HexAttributes = {
         alpha: 0.25,

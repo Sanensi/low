@@ -125,6 +125,12 @@ export class HexCity extends Hex {
 
 export class HexSettlement extends Hex {
   advanceToNextTurn = noop;
+
+  getBorder(world: World) {
+    return createArea(CITY_BORDER_RADIUS, this.position).filter((hex) =>
+      world.has(hex),
+    );
+  }
 }
 
 function noop() {}
