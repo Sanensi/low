@@ -31,6 +31,10 @@ export class World implements Iterable<Hex> {
     return this.map.values()[Symbol.iterator]();
   }
 
+  has(coord: HexCoordinate) {
+    return this.map.has(coord);
+  }
+
   advanceToNextTurn() {
     this.applyPlannedMovements();
     this.map.values().forEach((hex) => hex.advanceToNextTurn());

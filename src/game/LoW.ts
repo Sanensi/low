@@ -217,7 +217,7 @@ export class LoW extends PixiApplicationBase {
     }
 
     if (this.world.selectedHex instanceof HexCity) {
-      const border = this.world.selectedHex.getBorder();
+      const border = this.world.selectedHex.getBorder(this.world);
       const attributes: HexAttributes = {
         alpha: 0.25,
         fillColor: 0x0000ff,

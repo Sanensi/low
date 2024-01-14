@@ -3,6 +3,7 @@ import { HexCoordinate } from "../lib/hex/HexCoordinate";
 import { createArea } from "../lib/hex/HexCoordinatesFactory";
 import { Traversable } from "./HexPaths";
 import { Unit, Villager } from "./Unit";
+import { World } from "./World";
 
 const INITIAL_CITY_FOOD = 25;
 
@@ -40,9 +41,13 @@ export class HexWater extends Hex {
 
 export class HexCity extends Hex {
   private _food;
-  private associatedFarms = new Set<HexFarm>();
   private initialCity: HexCity;
-  private _size = 1;
+  private associatedFarms = new Set<HexFarm>();
+  private associatedCities = new Set<HexCity>();
+
+  private get size() {
+    return 1 + this.initialCity.associatedCities.size;
+  }
 
   get food() {
     return this.initialCity._food;
@@ -51,12 +56,12 @@ export class HexCity extends Hex {
   get foodBalance() {
     return (
       this.initialCity.associatedFarms.size -
-      CITY_FOOD_CONSUMPTION * this.initialCity._size
+      CITY_FOOD_CONSUMPTION * this.initialCity.size
     );
   }
 
   get foodCap() {
-    return this.initialCity._size * CITY_FOOD_CAP;
+    return this.initialCity.size * CITY_FOOD_CAP;
   }
 
   constructor(position: HexCoordinate, initialCity?: HexCity) {
@@ -103,9 +108,9 @@ export class HexCity extends Hex {
     assert(this.canGrow());
 
     this.initialCity._food -= CITY_GROWTH_COST;
-    this.initialCity._size += 1;
     const hexCity = new HexCity(hex.position, this.initialCity);
     hexCity._unit = hex.unit;
+    this.initialCity.associatedCities.add(hexCity);
 
     if (hex instanceof HexFarm) {
       hex.associatedCity.initialCity.associatedFarms.delete(hex);
@@ -114,8 +119,8 @@ export class HexCity extends Hex {
     return hexCity;
   }
 
-  getBorder() {
-    return createArea(3, this.position);
+  getBorder(world: World) {
+    return createArea(3, this.position).filter((coord) => world.has(coord));
   }
 }
 
