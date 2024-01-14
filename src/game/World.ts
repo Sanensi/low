@@ -270,6 +270,12 @@ export class World implements Iterable<Hex> {
       settlement.addVillager();
       villagerHex.unit = undefined!;
 
+      if (settlement.canPromoteToCity()) {
+        const city = new HexCity(settlement.position);
+        city.unit = settlement.unit;
+        this.map.set(city.position, city);
+      }
+
       return villager;
     }
   }

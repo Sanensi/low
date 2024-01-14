@@ -17,6 +17,8 @@ const CITY_GROWTH_COST = 25;
 const CITY_BORDER_RADIUS = 3;
 const FARM_BORDER_RADIUS = 1;
 
+export const SETTLEMENT_POPULATION_FOR_PROMOTION = 5;
+
 export class HexCity extends Hex {
   private _food;
   private initialCity: HexCity;
@@ -140,6 +142,10 @@ export class HexSettlement extends Hex {
 
   addVillager() {
     this._population++;
+  }
+
+  canPromoteToCity() {
+    return this.population === SETTLEMENT_POPULATION_FOR_PROMOTION;
   }
 }
 

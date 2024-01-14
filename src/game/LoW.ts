@@ -16,7 +16,11 @@ import { World } from "./World";
 import { deserialize } from "./MapSerialization";
 import defaultHexMap from "./maps/default-map.hex?raw";
 import { Vec2 } from "../lib/Vec2";
-import { HexCity, HexSettlement } from "./hexes/HexCity";
+import {
+  HexCity,
+  HexSettlement,
+  SETTLEMENT_POPULATION_FOR_PROMOTION,
+} from "./hexes/HexCity";
 
 const world = deserialize(defaultHexMap);
 const worldGraphics = createWorldGraphics(world.keys());
@@ -94,7 +98,7 @@ export class LoW extends PixiApplicationBase {
     if (this.world.selectedHex instanceof HexSettlement) {
       const lines = [
         "Settlement:",
-        `\t(${this.world.selectedHex.population}/5) Villagers to upgrade to City`,
+        `\t(${this.world.selectedHex.population}/${SETTLEMENT_POPULATION_FOR_PROMOTION}) Villagers to upgrade to City`,
       ];
 
       console.log(lines.join("\n"));
