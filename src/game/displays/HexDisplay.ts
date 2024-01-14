@@ -7,7 +7,7 @@ import {
   HexWater,
   HexFarm,
   HexSettlement,
-} from "../Hex";
+} from "../hexes/Hex";
 import { HexCoordinate } from "../../lib/hex/HexCoordinate";
 import { pointyHexToPixel } from "../../lib/hex/HexCoordinatesConversion";
 import { World } from "../World";

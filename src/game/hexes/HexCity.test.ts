@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
 
-import { HexCoordinate } from "../lib/hex/HexCoordinate";
+import { HexCoordinate } from "../../lib/hex/HexCoordinate";
 import { HexCity } from "./Hex";
-import { Villager } from "./Unit";
+import { Villager } from "../Unit";
 
 describe("HexCity", () => {
   test("When created, a city starts with 25 food", () => {

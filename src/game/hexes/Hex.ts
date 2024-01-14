@@ -1,10 +1,10 @@
-import { assert } from "../lib/Assertion";
-import { HexCoordinate } from "../lib/hex/HexCoordinate";
-import { createArea } from "../lib/hex/HexCoordinatesFactory";
-import { HexSet } from "../lib/hex/HexSet";
-import { Traversable } from "./HexPaths";
-import { Unit, Villager } from "./Unit";
-import { World } from "./World";
+import { assert } from "../../lib/Assertion";
+import { HexCoordinate } from "../../lib/hex/HexCoordinate";
+import { createArea } from "../../lib/hex/HexCoordinatesFactory";
+import { HexSet } from "../../lib/hex/HexSet";
+import { Traversable } from "../HexPaths";
+import { Unit, Villager } from "../Unit";
+import { World } from "../World";
 
 const INITIAL_CITY_FOOD = 25;
 
