@@ -1,4 +1,5 @@
-type HexDirection = "2h" | "4h" | "6h" | "8h" | "10h" | "12h";
+type PointyHexDirection = "1h" | "3h" | "5h" | "7h" | "9h" | "11h";
+type FlatHexDirection = "2h" | "4h" | "6h" | "8h" | "10h" | "12h";
 
 export class HexCoordinate {
   static readonly ZERO = new HexCoordinate(0, 0, 0);
@@ -35,7 +36,24 @@ export class HexCoordinate {
     return `(${this.q}, ${this.r}, ${this.s})`;
   }
 
-  static direction(direction: HexDirection) {
+  static pointyDirection(direction: PointyHexDirection) {
+    switch (direction) {
+      case "1h":
+        return this.UNIT_HEXES[0];
+      case "3h":
+        return this.UNIT_HEXES[1];
+      case "5h":
+        return this.UNIT_HEXES[2];
+      case "7h":
+        return this.UNIT_HEXES[3];
+      case "9h":
+        return this.UNIT_HEXES[4];
+      case "11h":
+        return this.UNIT_HEXES[5];
+    }
+  }
+
+  static flatDirection(direction: FlatHexDirection) {
     switch (direction) {
       case "2h":
         return this.UNIT_HEXES[0];

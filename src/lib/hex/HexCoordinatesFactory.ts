@@ -3,14 +3,14 @@ import { HexCoordinate } from "./HexCoordinate";
 export function createRing(radius = 1, center = HexCoordinate.ZERO) {
   const ring: HexCoordinate[] = [];
 
-  let hex = center.add(HexCoordinate.direction("2h").scale(radius));
+  let hex = center.add(HexCoordinate.flatDirection("2h").scale(radius));
   const directions = [
-    HexCoordinate.direction("6h"),
-    HexCoordinate.direction("8h"),
-    HexCoordinate.direction("10h"),
-    HexCoordinate.direction("12h"),
-    HexCoordinate.direction("2h"),
-    HexCoordinate.direction("4h"),
+    HexCoordinate.flatDirection("6h"),
+    HexCoordinate.flatDirection("8h"),
+    HexCoordinate.flatDirection("10h"),
+    HexCoordinate.flatDirection("12h"),
+    HexCoordinate.flatDirection("2h"),
+    HexCoordinate.flatDirection("4h"),
   ];
 
   for (const direction of directions) {
