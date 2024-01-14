@@ -1,6 +1,7 @@
 import { assert } from "../lib/Assertion";
 import { HexCoordinate } from "../lib/hex/HexCoordinate";
 import { createArea } from "../lib/hex/HexCoordinatesFactory";
+import { HexSet } from "../lib/hex/HexSet";
 import { Traversable } from "./HexPaths";
 import { Unit, Villager } from "./Unit";
 import { World } from "./World";
@@ -12,6 +13,9 @@ const CITY_FOOD_CAP = 25;
 
 const UNIT_FOOD_COST = 5;
 const CITY_GROWTH_COST = 25;
+
+const CITY_BORDER_RADIUS = 3;
+const FARM_BORDER_RADIUS = 1;
 
 export abstract class Hex implements Traversable {
   readonly isTraversable: boolean = true;
@@ -120,7 +124,28 @@ export class HexCity extends Hex {
   }
 
   getBorder(world: World) {
-    return createArea(3, this.position).filter((coord) => world.has(coord));
+    const border = new HexSet();
+
+    for (const hex of createArea(
+      CITY_BORDER_RADIUS,
+      this.initialCity.position,
+    )) {
+      border.add(hex);
+    }
+
+    for (const city of this.initialCity.associatedCities) {
+      for (const hex of createArea(CITY_BORDER_RADIUS, city.position)) {
+        border.add(hex);
+      }
+    }
+
+    for (const farm of this.initialCity.associatedFarms) {
+      for (const hex of createArea(FARM_BORDER_RADIUS, farm.position)) {
+        border.add(hex);
+      }
+    }
+
+    return border.values().filter((hex) => world.has(hex));
   }
 }
 
