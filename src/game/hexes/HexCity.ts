@@ -6,7 +6,7 @@ import { Villager } from "../Unit";
 import { World } from "../World";
 import { Hex, HexFarm } from "./Hex";
 
-const INITIAL_CITY_FOOD = 25;
+const INITIAL_CITY_FOOD = 10;
 
 const CITY_FOOD_CONSUMPTION = 1;
 const CITY_FOOD_CAP = 25;

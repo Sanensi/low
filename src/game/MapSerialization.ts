@@ -1,11 +1,12 @@
 import { assert, throwError } from "../lib/Assertion";
 import { Vec2 } from "../lib/Vec2";
+import { HexCoordinate } from "../lib/hex/HexCoordinate";
 import {
   doubleWidthCoordinatesToHex,
   hexToDoubleWidthCoordinates,
 } from "../lib/hex/HexCoordinatesConversion";
 import { HexMap } from "../lib/hex/HexMap";
-import { Hex, HexField, HexWater } from "./hexes/Hex";
+import { Hex, HexFarm, HexField, HexWater } from "./hexes/Hex";
 import { HexCity } from "./hexes/HexCity";
 
 export function serialize(map: HexMap<Hex>) {
@@ -69,6 +70,7 @@ export function deserialize(mapAsString: string) {
   const originOffset = new Vec2(Number.parseInt(x), Number.parseInt(y));
 
   const map = new HexMap<Hex>();
+  const coordsToBeConvertedToFarms = new Array<HexCoordinate>();
 
   for (let y = 0; y < hexes.length; y++) {
     for (let x = 0; x < hexes[y].length; x++) {
@@ -92,10 +94,30 @@ export function deserialize(mapAsString: string) {
         map.set(coord, new HexWater(coord));
       } else if (hex === "c") {
         map.set(coord, new HexCity(coord));
+      } else if (hex === "f") {
+        coordsToBeConvertedToFarms.push(coord);
       } else if (hex !== " ") {
         throw new Error(`Unsupported symbol at position (${x}, ${y}): ${hex}`);
       }
     }
+  }
+
+  for (const farmCoord of coordsToBeConvertedToFarms) {
+    const neighboringCities = farmCoord
+      .neighbors()
+      .map((coord) => map.get(coord))
+      .filter((hex): hex is HexCity => hex instanceof HexCity);
+
+    const p = hexToDoubleWidthCoordinates(farmCoord);
+    assert(
+      neighboringCities.length === 1,
+      `Expected farm at (${p.x}, ${p.y}) to be neighbor of exactly one city`,
+    );
+
+    const city = neighboringCities[0];
+    const farm = new HexFarm(farmCoord, city);
+    city.addFarm(farm);
+    map.set(farmCoord, farm);
   }
 
   return map;
