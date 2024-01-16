@@ -214,7 +214,7 @@ export class World implements Iterable<Hex> {
         (hex): hex is HexCity | HexSettlement =>
           hex instanceof HexCity || hex instanceof HexSettlement,
       )
-      .flatMap((city) => city.getBorder(this));
+      .flatMap((city) => city.border);
 
     const selectedHexOutsideExistingCityBorder = !existingCityBorders.some(
       (hex) => hex.equals(this.selectedHex?.position),

@@ -24,6 +24,7 @@ export class HexCity extends Hex {
   private initialCity: HexCity;
   private associatedFarms = new Set<HexFarm>();
   private associatedCities = new Set<HexCity>();
+  private _border = new HexSet();
 
   private get size() {
     return 1 + this.initialCity.associatedCities.size;
@@ -44,10 +45,15 @@ export class HexCity extends Hex {
     return this.initialCity.size * CITY_FOOD_CAP;
   }
 
+  get border() {
+    return this.initialCity._border.values();
+  }
+
   constructor(position: HexCoordinate, initialCity?: HexCity) {
     super(position);
     this.initialCity = initialCity ?? this;
     this._food = this.initialCity === this ? INITIAL_CITY_FOOD : 0;
+    this.updateBorder();
   }
 
   advanceToNextTurn(): void {
@@ -75,6 +81,7 @@ export class HexCity extends Hex {
 
   addFarm(farm: HexFarm) {
     this.initialCity.associatedFarms.add(farm);
+    this.initialCity.updateBorder();
   }
 
   canGrow() {
@@ -96,40 +103,46 @@ export class HexCity extends Hex {
       hex.associatedCity.initialCity.associatedFarms.delete(hex);
     }
 
+    this.initialCity.updateBorder();
     return hexCity;
   }
 
-  getBorder(world: World) {
-    const border = new HexSet();
+  updateBorder() {
+    const border = new Array<HexCoordinate>();
 
     for (const hex of createArea(
       CITY_BORDER_RADIUS,
       this.initialCity.position,
     )) {
-      border.add(hex);
+      border.push(hex);
     }
 
     for (const city of this.initialCity.associatedCities) {
       for (const hex of createArea(CITY_BORDER_RADIUS, city.position)) {
-        border.add(hex);
+        border.push(hex);
       }
     }
 
     for (const farm of this.initialCity.associatedFarms) {
       for (const hex of createArea(FARM_BORDER_RADIUS, farm.position)) {
-        border.add(hex);
+        border.push(hex);
       }
     }
 
-    return border.values().filter((hex) => world.has(hex));
+    this._border = new HexSet(border);
   }
 }
 
 export class HexSettlement extends Hex {
   private _population = 1;
+  private _border = new HexSet(createArea(CITY_BORDER_RADIUS, this.position));
 
   public get population() {
     return this._population;
+  }
+
+  public get border() {
+    return this._border.values();
   }
 
   advanceToNextTurn = noop;

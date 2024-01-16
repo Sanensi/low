@@ -266,7 +266,9 @@ export class LoW extends PixiApplicationBase {
       this.world.selectedHex instanceof HexCity ||
       this.world.selectedHex instanceof HexSettlement
     ) {
-      const border = this.world.selectedHex.getBorder(this.world);
+      const border = this.world.selectedHex.border.filter((coord) =>
+        this.world.has(coord),
+      );
       const attributes: HexAttributes = {
         alpha: 0.25,
         fillColor: 0x0000ff,
