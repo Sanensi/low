@@ -280,6 +280,7 @@ export class World implements Iterable<Hex> {
         const city = new HexCity(settlement.position, this.borders);
         city.unit = settlement.unit;
         this.map.set(city.position, city);
+        this.borders.transferOwnership(settlement, city);
       }
 
       return villager;

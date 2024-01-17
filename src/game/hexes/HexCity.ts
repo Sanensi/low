@@ -133,7 +133,7 @@ export class HexCity extends Hex {
       }
     }
 
-    this.borders.updateBorderFor(this.initialCity, border);
+    this.borders.acquireBorderFor(this.initialCity, border);
   }
 }
 
@@ -152,7 +152,7 @@ export class HexSettlement extends Hex {
   constructor(position: HexCoordinate, borders: Borders) {
     super(position);
     this.borders = borders;
-    this.borders.updateBorderFor(
+    this.borders.acquireBorderFor(
       this,
       createArea(CITY_BORDER_RADIUS, this.position),
     );
