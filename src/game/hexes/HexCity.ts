@@ -2,6 +2,7 @@ import { assert } from "../../lib/Assertion";
 import { HexCoordinate } from "../../lib/hex/HexCoordinate";
 import { createArea } from "../../lib/hex/HexCoordinatesFactory";
 import { HexSet } from "../../lib/hex/HexSet";
+import { Borders } from "../Borders";
 import { Villager } from "../Unit";
 import { World } from "../World";
 import { Hex, HexFarm } from "./Hex";
@@ -24,7 +25,7 @@ export class HexCity extends Hex {
   private initialCity: HexCity;
   private associatedFarms = new Set<HexFarm>();
   private associatedCities = new Set<HexCity>();
-  private _border = new HexSet();
+  private _border = new Borders();
 
   private get size() {
     return 1 + this.initialCity.associatedCities.size;
@@ -46,7 +47,7 @@ export class HexCity extends Hex {
   }
 
   get border() {
-    return this.initialCity._border.values();
+    return this._border.values();
   }
 
   constructor(position: HexCoordinate, initialCity?: HexCity) {
@@ -129,7 +130,7 @@ export class HexCity extends Hex {
       }
     }
 
-    this._border = new HexSet(border);
+    this._border.overwriteWith(border);
   }
 }
 
