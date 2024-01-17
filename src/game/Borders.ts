@@ -1,14 +1,19 @@
+import { throwError } from "../lib/Assertion";
 import { HexCoordinate } from "../lib/hex/HexCoordinate";
 import { HexSet } from "../lib/hex/HexSet";
+import { HexCity } from "./hexes/HexCity";
 
 export class Borders {
-  private coords = new HexSet();
+  private readonly borderByCities = new Map<HexCity, HexSet>();
 
-  overwriteWith(coords: HexCoordinate[]) {
-    this.coords = new HexSet(coords);
+  updateBorderFor(city: HexCity, coords: HexCoordinate[]) {
+    this.borderByCities.set(city, new HexSet(coords));
   }
 
-  values() {
-    return this.coords.values();
+  getBorderFor(city: HexCity) {
+    return (
+      this.borderByCities.get(city)?.values() ??
+      throwError("No border founds for this city")
+    );
   }
 }

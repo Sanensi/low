@@ -1,6 +1,7 @@
 import { assert, throwError } from "../lib/Assertion";
 import { HexCoordinate } from "../lib/hex/HexCoordinate";
 import { HexMap } from "../lib/hex/HexMap";
+import { Borders } from "./Borders";
 import { Hex, HexFarm, HexField } from "./hexes/Hex";
 import { HexCity, HexSettlement } from "./hexes/HexCity";
 import { findReachableHex, findShortestPath } from "./HexPaths";
@@ -8,6 +9,7 @@ import { Unit, Villager } from "./Unit";
 
 export class World implements Iterable<Hex> {
   readonly map = new HexMap<Hex>();
+  private readonly borders: Borders;
 
   private selectedCoords?: HexCoordinate;
   get selectedHex() {
@@ -24,8 +26,9 @@ export class World implements Iterable<Hex> {
     return this._reachableHexes;
   }
 
-  constructor(hexMap: HexMap<Hex>) {
+  constructor(hexMap: HexMap<Hex>, borders: Borders) {
     this.map = hexMap;
+    this.borders = borders;
   }
 
   [Symbol.iterator](): IterableIterator<Hex> {
@@ -271,7 +274,7 @@ export class World implements Iterable<Hex> {
       villagerHex.unit = undefined!;
 
       if (settlement.canPromoteToCity()) {
-        const city = new HexCity(settlement.position);
+        const city = new HexCity(settlement.position, this.borders);
         city.unit = settlement.unit;
         this.map.set(city.position, city);
       }

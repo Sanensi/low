@@ -7,6 +7,7 @@ import {
 } from "../lib/hex/HexCoordinatesConversion";
 import { HexMap } from "../lib/hex/HexMap";
 import { World } from "./World";
+import { Borders } from "./Borders";
 import { Hex, HexFarm, HexField, HexWater } from "./hexes/Hex";
 import { HexCity } from "./hexes/HexCity";
 
@@ -71,6 +72,7 @@ export function deserialize(mapAsString: string) {
   const originOffset = new Vec2(Number.parseInt(x), Number.parseInt(y));
 
   const map = new HexMap<Hex>();
+  const borders = new Borders();
   const coordsToBeConvertedToFarms = new Array<HexCoordinate>();
 
   for (let y = 0; y < hexes.length; y++) {
@@ -94,7 +96,7 @@ export function deserialize(mapAsString: string) {
       } else if (hex === "w") {
         map.set(coord, new HexWater(coord));
       } else if (hex === "c") {
-        map.set(coord, new HexCity(coord));
+        map.set(coord, new HexCity(coord, borders));
       } else if (hex === "f") {
         coordsToBeConvertedToFarms.push(coord);
       } else if (hex !== " ") {
@@ -121,5 +123,5 @@ export function deserialize(mapAsString: string) {
     map.set(farmCoord, farm);
   }
 
-  return new World(map);
+  return new World(map, borders);
 }

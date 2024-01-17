@@ -25,7 +25,7 @@ export class HexCity extends Hex {
   private initialCity: HexCity;
   private associatedFarms = new Set<HexFarm>();
   private associatedCities = new Set<HexCity>();
-  private _border = new Borders();
+  private readonly borders: Borders;
 
   private get size() {
     return 1 + this.initialCity.associatedCities.size;
@@ -47,13 +47,18 @@ export class HexCity extends Hex {
   }
 
   get border() {
-    return this._border.values();
+    return this.borders.getBorderFor(this.initialCity);
   }
 
-  constructor(position: HexCoordinate, initialCity?: HexCity) {
+  constructor(
+    position: HexCoordinate,
+    borders: Borders,
+    initialCity?: HexCity,
+  ) {
     super(position);
     this.initialCity = initialCity ?? this;
     this._food = this.initialCity === this ? INITIAL_CITY_FOOD : 0;
+    this.borders = borders;
     this.updateBorder();
   }
 
@@ -96,7 +101,7 @@ export class HexCity extends Hex {
     assert(this.canGrow());
 
     this.initialCity._food -= CITY_GROWTH_COST;
-    const hexCity = new HexCity(hex.position, this.initialCity);
+    const hexCity = new HexCity(hex.position, this.borders, this.initialCity);
     hexCity._unit = hex.unit;
     this.initialCity.associatedCities.add(hexCity);
 
@@ -108,7 +113,7 @@ export class HexCity extends Hex {
     return hexCity;
   }
 
-  updateBorder() {
+  private updateBorder() {
     const border = new Array<HexCoordinate>();
 
     for (const hex of createArea(
@@ -130,7 +135,7 @@ export class HexCity extends Hex {
       }
     }
 
-    this._border.overwriteWith(border);
+    this.borders.updateBorderFor(this.initialCity, border);
   }
 }
 
