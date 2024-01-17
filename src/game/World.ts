@@ -7,7 +7,7 @@ import { findReachableHex, findShortestPath } from "./HexPaths";
 import { Unit, Villager } from "./Unit";
 
 export class World implements Iterable<Hex> {
-  private map = new HexMap<Hex>();
+  readonly map = new HexMap<Hex>();
 
   private selectedCoords?: HexCoordinate;
   get selectedHex() {

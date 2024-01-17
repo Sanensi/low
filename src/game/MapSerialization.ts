@@ -6,6 +6,7 @@ import {
   hexToDoubleWidthCoordinates,
 } from "../lib/hex/HexCoordinatesConversion";
 import { HexMap } from "../lib/hex/HexMap";
+import { World } from "./World";
 import { Hex, HexFarm, HexField, HexWater } from "./hexes/Hex";
 import { HexCity } from "./hexes/HexCity";
 
@@ -120,5 +121,5 @@ export function deserialize(mapAsString: string) {
     map.set(farmCoord, farm);
   }
 
-  return map;
+  return new World(map);
 }

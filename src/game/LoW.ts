@@ -23,13 +23,13 @@ import {
 } from "./hexes/HexCity";
 
 const world = deserialize(defaultHexMap);
-const worldGraphics = createWorldGraphics(world.keys());
+const worldGraphics = createWorldGraphics(world.map.keys());
 const pathGraphics = new Graphics();
 const cityBorderHighlightGraphics = new Graphics();
 const unitDisplays = new Map<Unit, Text>();
 
 export class LoW extends PixiApplicationBase {
-  private world: World = new World(world);
+  private world: World = world;
   private currentTurn = 1;
 
   private highlightedCoords?: HexCoordinate;
