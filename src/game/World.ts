@@ -234,7 +234,10 @@ export class World implements Iterable<Hex> {
     if (this.canFoundNewSettlement()) {
       const hexFields = this.selectedHex;
       const villager = this.selectedHex.unit;
-      const settlement = new HexSettlement(this.selectedHex.position);
+      const settlement = new HexSettlement(
+        this.selectedHex.position,
+        this.borders,
+      );
       this.map.set(settlement.position, settlement);
       hexFields.unit = undefined!;
 

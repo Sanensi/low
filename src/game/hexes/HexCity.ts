@@ -1,10 +1,8 @@
 import { assert } from "../../lib/Assertion";
 import { HexCoordinate } from "../../lib/hex/HexCoordinate";
 import { createArea } from "../../lib/hex/HexCoordinatesFactory";
-import { HexSet } from "../../lib/hex/HexSet";
 import { Borders } from "../Borders";
 import { Villager } from "../Unit";
-import { World } from "../World";
 import { Hex, HexFarm } from "./Hex";
 
 const INITIAL_CITY_FOOD = 10;
@@ -141,23 +139,26 @@ export class HexCity extends Hex {
 
 export class HexSettlement extends Hex {
   private _population = 1;
-  private _border = new HexSet(createArea(CITY_BORDER_RADIUS, this.position));
+  private readonly borders: Borders;
 
   public get population() {
     return this._population;
   }
 
   public get border() {
-    return this._border.values();
+    return this.borders.getBorderFor(this);
+  }
+
+  constructor(position: HexCoordinate, borders: Borders) {
+    super(position);
+    this.borders = borders;
+    this.borders.updateBorderFor(
+      this,
+      createArea(CITY_BORDER_RADIUS, this.position),
+    );
   }
 
   advanceToNextTurn = noop;
-
-  getBorder(world: World) {
-    return createArea(CITY_BORDER_RADIUS, this.position).filter((hex) =>
-      world.has(hex),
-    );
-  }
 
   addVillager() {
     this._population++;
