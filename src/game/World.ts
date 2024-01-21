@@ -51,17 +51,23 @@ export class World implements Iterable<Hex>, ReadonlyWorld {
   }
 
   private applyPlannedMovements() {
+    const targetPositions = new Array<[Unit, HexCoordinate]>();
+
     this.map.values().forEach((hex) => {
       if (hex.unit?.plannedPath) {
         const targetPosition =
           hex.unit.plannedPath[hex.unit.plannedPath.length - 1];
-        const targetHex = this.map.get(targetPosition) ?? throwError();
-        targetHex.unit = hex.unit;
-        hex.unit.position = targetPosition;
+        targetPositions.push([hex.unit, targetPosition]);
         hex.unit.clearPlannedPath();
         hex.unit = undefined;
       }
     });
+
+    for (const [unit, targetPosition] of targetPositions) {
+      const targetHex = this.map.get(targetPosition) ?? throwError();
+      targetHex.unit = unit;
+      unit.position = targetPosition;
+    }
   }
 
   select(coord: HexCoordinate): asserts this is this & { selectedHex: Hex } {

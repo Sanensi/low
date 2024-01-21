@@ -18,7 +18,7 @@
 ## Bugs
 
 - When canceling movement, the reachableHexes doesn't get updated ✅
-- When moving a unit to the cell previously occupied by another unit, then chaos ensue
+- When moving a unit to the cell previously occupied by another unit, then chaos ensue ✅
 - When creating farms outside of a city border (aka inside the border of another city), then these farms are not owned by the city for which the borders are owned ✅
 
 ## Notes
