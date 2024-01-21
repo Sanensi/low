@@ -12,6 +12,21 @@ export class Borders {
     return this.borderByCities.get(city)?.values() ?? throwError();
   }
 
+  claimBorder(city: HexCity | HexSettlement, borders: HexCoordinate[]) {
+    if (!this.borderByCities.get(city)) {
+      this.borderByCities.set(city, new HexSet());
+    }
+
+    for (const coord of borders) {
+      const previousOwner = this.hexOwnership.get(coord);
+      if (previousOwner) {
+        this.borderByCities.get(previousOwner)?.delete(coord);
+      }
+      this.hexOwnership.set(coord, city);
+      this.borderByCities.get(city)?.add(coord);
+    }
+  }
+
   acquireUnclaimedBorderFor(
     city: HexCity | HexSettlement,
     claimedCoords: HexCoordinate[],

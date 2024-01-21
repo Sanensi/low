@@ -152,6 +152,7 @@ export class HexSettlement extends Hex {
   constructor(position: HexCoordinate, borders: Borders) {
     super(position);
     this.borders = borders;
+    this.borders.claimBorder(this, createArea(1, this.position));
     this.borders.acquireUnclaimedBorderFor(
       this,
       createArea(CITY_BORDER_RADIUS, this.position),
