@@ -14,7 +14,6 @@ const UNIT_FOOD_COST = 5;
 const CITY_GROWTH_COST = 25;
 
 const CITY_BORDER_RADIUS = 3;
-const FARM_BORDER_RADIUS = 1;
 
 export const SETTLEMENT_POPULATION_FOR_PROMOTION = 5;
 
@@ -57,7 +56,10 @@ export class HexCity extends Hex {
     this.initialCity = initialCity ?? this;
     this._food = this.initialCity === this ? INITIAL_CITY_FOOD : 0;
     this.borders = borders;
-    this.updateBorder();
+    this.borders.acquireUnclaimedBorderFor(
+      this.initialCity,
+      createArea(CITY_BORDER_RADIUS, this.position),
+    );
   }
 
   advanceToNextTurn(): void {
@@ -85,7 +87,6 @@ export class HexCity extends Hex {
 
   addFarm(farm: HexFarm) {
     this.initialCity.associatedFarms.add(farm);
-    this.initialCity.updateBorder();
   }
 
   canGrow() {
@@ -107,33 +108,7 @@ export class HexCity extends Hex {
       hex.associatedCity.initialCity.associatedFarms.delete(hex);
     }
 
-    this.initialCity.updateBorder();
     return hexCity;
-  }
-
-  private updateBorder() {
-    const border = new Array<HexCoordinate>();
-
-    for (const hex of createArea(
-      CITY_BORDER_RADIUS,
-      this.initialCity.position,
-    )) {
-      border.push(hex);
-    }
-
-    for (const city of this.initialCity.associatedCities) {
-      for (const hex of createArea(CITY_BORDER_RADIUS, city.position)) {
-        border.push(hex);
-      }
-    }
-
-    for (const farm of this.initialCity.associatedFarms) {
-      for (const hex of createArea(FARM_BORDER_RADIUS, farm.position)) {
-        border.push(hex);
-      }
-    }
-
-    this.borders.acquireUnclaimedBorderFor(this.initialCity, border);
   }
 }
 

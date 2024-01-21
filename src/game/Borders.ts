@@ -29,13 +29,13 @@ export class Borders {
 
   acquireUnclaimedBorderFor(
     city: HexCity | HexSettlement,
-    claimedCoords: HexCoordinate[],
+    border: HexCoordinate[],
   ) {
     if (!this.borderByCities.get(city)) {
       this.borderByCities.set(city, new HexSet());
     }
 
-    for (const coord of claimedCoords) {
+    for (const coord of border) {
       if (!this.hexOwnership.has(coord)) {
         this.hexOwnership.set(coord, city);
         this.borderByCities.get(city)?.add(coord);
