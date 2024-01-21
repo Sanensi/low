@@ -12,22 +12,20 @@ export class Borders {
     return this.borderByCities.get(city)?.values() ?? throwError();
   }
 
-  acquireBorderFor(
+  acquireUnclaimedBorderFor(
     city: HexCity | HexSettlement,
     claimedCoords: HexCoordinate[],
   ) {
-    const claimableCoords = claimedCoords.filter(
-      (coord) => !this.hexOwnership.has(coord),
-    );
-    for (const coord of claimableCoords) {
-      this.hexOwnership.set(coord, city);
+    if (!this.borderByCities.get(city)) {
+      this.borderByCities.set(city, new HexSet());
     }
-    const hexOwnedByThisCity = this.hexOwnership
-      .entries()
-      .filter(([, hexOwner]) => hexOwner === city)
-      .map(([coord]) => coord);
 
-    this.borderByCities.set(city, new HexSet(hexOwnedByThisCity));
+    for (const coord of claimedCoords) {
+      if (!this.hexOwnership.has(coord)) {
+        this.hexOwnership.set(coord, city);
+        this.borderByCities.get(city)?.add(coord);
+      }
+    }
   }
 
   transferOwnership(from: HexSettlement, to: HexCity) {

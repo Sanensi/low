@@ -1,7 +1,7 @@
 # TODO
 
-- Refactor city border to be persisted instead of calculated.
-  - This should resolve any border dispute between two neighboring cities, giving the older city its acquired rights
+- Refactor city border to be persisted instead of calculated. ✅
+  - This should help resolve any border dispute between two neighboring cities, giving the older city its acquired rights
 - Consider replacing javascript getter for functionnal getter defined in the base interface
   - `this is this` typeguards are not playing nicely with wrapped getters
 - Refactor: Remove duplicate Unit selection state ✅
