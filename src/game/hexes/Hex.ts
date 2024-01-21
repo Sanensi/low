@@ -1,7 +1,6 @@
 import { HexCoordinate } from "../../lib/hex/HexCoordinate";
 import { Traversable } from "../HexPaths";
 import { Unit } from "../Unit";
-import { HexCity } from "./HexCity";
 
 export abstract class Hex implements Traversable {
   readonly isTraversable: boolean = true;
@@ -31,14 +30,6 @@ export class HexWater extends Hex {
 
 export class HexFarm extends Hex {
   advanceToNextTurn = noop;
-
-  readonly associatedCity: HexCity;
-
-  constructor(position: HexCoordinate, associatedCity: HexCity) {
-    super(position);
-    this.associatedCity = associatedCity;
-    this.associatedCity.addFarm(this);
-  }
 }
 
 function noop() {}

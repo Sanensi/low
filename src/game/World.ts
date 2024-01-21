@@ -7,7 +7,11 @@ import { HexCity, HexSettlement } from "./hexes/HexCity";
 import { findReachableHex, findShortestPath } from "./HexPaths";
 import { Unit, Villager } from "./Unit";
 
-export class World implements Iterable<Hex> {
+export interface ReadonlyWorld {
+  readonly map: HexMap<Hex>;
+}
+
+export class World implements Iterable<Hex>, ReadonlyWorld {
   readonly map = new HexMap<Hex>();
   private readonly borders: Borders;
 
@@ -167,15 +171,8 @@ export class World implements Iterable<Hex> {
     if (this.canCreateFarm()) {
       const hexField = this.selectedHex;
       const villager = this.selectedHex.unit;
-      const neighbors = hexField.position
-        .neighbors()
-        .map((coord) => this.map.get(coord));
-      const neighborCity =
-        neighbors.filter((hex): hex is HexCity => hex instanceof HexCity)[0] ??
-        neighbors.filter((hex): hex is HexFarm => hex instanceof HexFarm)[0]
-          .associatedCity;
 
-      const hexFarm = new HexFarm(this.selectedHex.position, neighborCity);
+      const hexFarm = new HexFarm(this.selectedHex.position);
       this.map.set(hexFarm.position, hexFarm);
       hexField.unit = undefined!;
 
@@ -277,7 +274,7 @@ export class World implements Iterable<Hex> {
       villagerHex.unit = undefined!;
 
       if (settlement.canPromoteToCity()) {
-        const city = new HexCity(settlement.position, this.borders);
+        const city = new HexCity(this, settlement.position, this.borders);
         city.unit = settlement.unit;
         this.map.set(city.position, city);
         this.borders.transferOwnership(settlement, city);

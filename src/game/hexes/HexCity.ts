@@ -3,6 +3,7 @@ import { HexCoordinate } from "../../lib/hex/HexCoordinate";
 import { createArea } from "../../lib/hex/HexCoordinatesFactory";
 import { Borders } from "../Borders";
 import { Villager } from "../Unit";
+import { ReadonlyWorld } from "../World";
 import { Hex, HexFarm } from "./Hex";
 
 const INITIAL_CITY_FOOD = 10;
@@ -20,12 +21,17 @@ export const SETTLEMENT_POPULATION_FOR_PROMOTION = 5;
 export class HexCity extends Hex {
   private _food;
   private initialCity: HexCity;
-  private associatedFarms = new Set<HexFarm>();
   private associatedCities = new Set<HexCity>();
   private readonly borders: Borders;
 
   private get size() {
     return 1 + this.initialCity.associatedCities.size;
+  }
+
+  private get associatedFarms() {
+    return this.border
+      .map((coord) => this.world.map.get(coord))
+      .filter((hex): hex is HexFarm => hex instanceof HexFarm);
   }
 
   get food() {
@@ -34,7 +40,7 @@ export class HexCity extends Hex {
 
   get foodBalance() {
     return (
-      this.initialCity.associatedFarms.size -
+      this.initialCity.associatedFarms.length -
       CITY_FOOD_CONSUMPTION * this.initialCity.size
     );
   }
@@ -48,6 +54,7 @@ export class HexCity extends Hex {
   }
 
   constructor(
+    private readonly world: ReadonlyWorld,
     position: HexCoordinate,
     borders: Borders,
     initialCity?: HexCity,
@@ -85,14 +92,10 @@ export class HexCity extends Hex {
     this._unit = new Villager(this.position);
   }
 
-  addFarm(farm: HexFarm) {
-    this.initialCity.associatedFarms.add(farm);
-  }
-
   canGrow() {
     return (
       this.initialCity._food >= CITY_GROWTH_COST &&
-      this.initialCity.associatedFarms.size > 0
+      this.initialCity.associatedFarms.length > 0
     );
   }
 
@@ -100,13 +103,14 @@ export class HexCity extends Hex {
     assert(this.canGrow());
 
     this.initialCity._food -= CITY_GROWTH_COST;
-    const hexCity = new HexCity(hex.position, this.borders, this.initialCity);
+    const hexCity = new HexCity(
+      this.world,
+      hex.position,
+      this.borders,
+      this.initialCity,
+    );
     hexCity._unit = hex.unit;
     this.initialCity.associatedCities.add(hexCity);
-
-    if (hex instanceof HexFarm) {
-      hex.associatedCity.initialCity.associatedFarms.delete(hex);
-    }
 
     return hexCity;
   }
@@ -116,11 +120,11 @@ export class HexSettlement extends Hex {
   private _population = 1;
   private readonly borders: Borders;
 
-  public get population() {
+  get population() {
     return this._population;
   }
 
-  public get border() {
+  get border() {
     return this.borders.getBorderFor(this);
   }
 
