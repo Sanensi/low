@@ -1,6 +1,6 @@
 import { HexCoordinate } from "./HexCoordinate";
 
-export class HexSet {
+export class HexSet implements Iterable<HexCoordinate> {
   private readonly map = new Map<string, HexCoordinate>();
 
   public get size() {
@@ -9,6 +9,10 @@ export class HexSet {
 
   constructor(hexes: HexCoordinate[] = []) {
     this.map = new Map(hexes.map((hex) => [hex.toString(), hex]));
+  }
+
+  [Symbol.iterator](): IterableIterator<HexCoordinate> {
+    return this.map.values();
   }
 
   add(value: HexCoordinate) {

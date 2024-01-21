@@ -29,19 +29,16 @@ export class Borders {
   }
 
   transferOwnership(from: HexSettlement, to: HexCity) {
-    const coordsToTransfer = this.hexOwnership
-      .entries()
-      .filter(([, hexOwner]) => hexOwner === from)
-      .map(([coord]) => coord);
-
-    for (const coord of coordsToTransfer) {
-      this.hexOwnership.set(coord, to);
+    if (!this.borderByCities.get(to)) {
+      this.borderByCities.set(to, new HexSet());
     }
-    const hexOwnedByRecipientCity = this.hexOwnership
-      .entries()
-      .filter(([, hexOwner]) => hexOwner === to)
-      .map(([coord]) => coord);
-    this.borderByCities.set(to, new HexSet(hexOwnedByRecipientCity));
+
+    const borderToTransfer = this.borderByCities.get(from) ?? throwError();
+    for (const coord of borderToTransfer) {
+      this.hexOwnership.set(coord, to);
+      this.borderByCities.get(to)?.add(coord);
+    }
+
     this.borderByCities.delete(from);
   }
 }
