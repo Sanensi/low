@@ -1,7 +1,7 @@
 import { assert, throwError } from "../lib/Assertion";
 import { Comparer, Heap } from "../lib/Heap";
 import { HexCoordinate } from "../lib/hex/HexCoordinate";
-import { HexMap } from "../lib/hex/HexMap";
+import { HexMap, ReadonlyHexMap } from "../lib/hex/HexMap";
 
 export interface Traversable {
   readonly isTraversable: boolean;
@@ -10,7 +10,7 @@ export interface Traversable {
 export function findReachableHex(
   origin: HexCoordinate,
   range: number,
-  world: HexMap<Traversable>,
+  map: ReadonlyHexMap<Traversable>,
 ) {
   const visited = [origin];
   const fringes = [[origin]];
@@ -19,7 +19,7 @@ export function findReachableHex(
     fringes.push([]);
     for (const coord of fringes[step - 1]) {
       for (const neighborCoord of coord.neighbors()) {
-        const neighborHex = world.get(neighborCoord);
+        const neighborHex = map.get(neighborCoord);
         if (
           neighborHex &&
           neighborHex.isTraversable &&
@@ -45,7 +45,7 @@ const compareHexDistance: Comparer<HexDistancePair> = (
 export function findShortestPath(
   origin: HexCoordinate,
   destination: HexCoordinate,
-  world: HexMap<Traversable>,
+  map: ReadonlyHexMap<Traversable>,
 ) {
   const frontier = new Heap(compareHexDistance);
   frontier.push([origin, 0]);
@@ -64,7 +64,7 @@ export function findShortestPath(
 
     const traversableNeighbors = currentHex
       .neighbors()
-      .filter((neighbor) => world.get(neighbor)?.isTraversable);
+      .filter((neighbor) => map.get(neighbor)?.isTraversable);
     for (const nextNeighbor of traversableNeighbors) {
       const stepToReachNextNeighbor =
         (stepToReach.get(currentHex) ?? throwError()) + 1;

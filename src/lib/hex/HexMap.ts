@@ -1,6 +1,14 @@
 import { HexCoordinate } from "./HexCoordinate";
 
-export class HexMap<T> {
+export interface ReadonlyHexMap<T> {
+  get(key?: HexCoordinate): T | undefined;
+  has(key: HexCoordinate): boolean;
+  keys(): HexCoordinate[];
+  values(): T[];
+  entries(): [HexCoordinate, T][];
+}
+
+export class HexMap<T> implements ReadonlyHexMap<T> {
   private readonly map = new Map<string, { key: HexCoordinate; value: T }>();
 
   constructor(entries: readonly (readonly [HexCoordinate, T])[] = []) {
@@ -32,8 +40,9 @@ export class HexMap<T> {
   }
 
   entries() {
-    return [...this.map.values()].map(
-      ({ key, value }) => [key, value] as const,
-    );
+    return [...this.map.values()].map(({ key, value }): [HexCoordinate, T] => [
+      key,
+      value,
+    ]);
   }
 }

@@ -1,6 +1,6 @@
 import { assert, throwError } from "../lib/Assertion";
 import { HexCoordinate } from "../lib/hex/HexCoordinate";
-import { HexMap } from "../lib/hex/HexMap";
+import { HexMap, ReadonlyHexMap } from "../lib/hex/HexMap";
 import { Borders } from "./Borders";
 import { Hex, HexFarm, HexField } from "./hexes/Hex";
 import { HexCity, HexSettlement } from "./hexes/HexCity";
@@ -8,7 +8,7 @@ import { findReachableHex, findShortestPath } from "./HexPaths";
 import { Unit, Villager } from "./Unit";
 
 export interface ReadonlyWorld {
-  readonly map: HexMap<Hex>;
+  readonly map: ReadonlyHexMap<Hex>;
 }
 
 export class World implements Iterable<Hex>, ReadonlyWorld {
