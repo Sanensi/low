@@ -30,7 +30,29 @@ test("A City has a food capacity of 25", () => {
   ).toEqual(25);
 });
 
-describe("A Farm generates 1 food per turn on its Hex", () => {});
+describe("A Farm generates 1 food per turn on its Hex", () => {
+  test("A farm starts with 0 food", () => {
+    expect(new HexFarm(HexCoordinate.ZERO).food2).toEqual(0);
+  });
+
+  test("A farm has 1 food after a single turn", () => {
+    const farm = new HexFarm(HexCoordinate.ZERO);
+
+    farm.advanceToNextTurn();
+
+    expect(farm.food2).toEqual(1);
+  });
+
+  test("After more than 5 turn, the farm reach its food capacity", () => {
+    const farm = new HexFarm(HexCoordinate.ZERO);
+
+    for (let i = 0; i < 7; i++) {
+      farm.advanceToNextTurn();
+    }
+
+    expect(farm.food2).toEqual(farm.foodCapacity);
+  });
+});
 
 describe("An Hex with food but no city to deliver it to keep its food for the turn", () => {});
 

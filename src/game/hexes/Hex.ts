@@ -5,6 +5,7 @@ import { Unit } from "../Unit";
 export abstract class Hex implements Traversable {
   readonly isTraversable: boolean = true;
   readonly foodCapacity: number = 5;
+  public food2 = 0;
 
   protected _unit?: Unit;
   get unit() {
@@ -30,7 +31,9 @@ export class HexWater extends Hex {
 }
 
 export class HexFarm extends Hex {
-  advanceToNextTurn = noop;
+  advanceToNextTurn() {
+    this.food2 = Math.min(this.food2 + 1, this.foodCapacity);
+  }
 }
 
 function noop() {}
