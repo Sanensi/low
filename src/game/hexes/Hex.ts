@@ -1,3 +1,4 @@
+import { assert } from "../../lib/Assertion";
 import { HexCoordinate } from "../../lib/hex/HexCoordinate";
 import { Traversable } from "../HexPaths";
 import { Unit } from "../Unit";
@@ -5,7 +6,19 @@ import { Unit } from "../Unit";
 export abstract class Hex implements Traversable {
   readonly isTraversable: boolean = true;
   readonly foodCapacity: number = 5;
-  public food2 = 0;
+
+  protected _food2 = 0;
+  get food2() {
+    return this._food2;
+  }
+  set food2(value) {
+    assert(value >= 0, "There can't be negative food on an Hex");
+    assert(
+      value <= this.foodCapacity,
+      `Can't have more food than the capacity of this Hex: (${value}/${this.foodCapacity})`,
+    );
+    this._food2 = value;
+  }
 
   protected _unit?: Unit;
   get unit() {
