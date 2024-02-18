@@ -5,6 +5,8 @@ import { HexCity, HexSettlement } from "./hexes/HexCity";
 import { Borders } from "./Borders";
 import { World } from "./World";
 import { HexMap } from "../lib/hex/HexMap";
+import { deserialize } from "./MapSerialization";
+import { assert } from "../lib/Assertion";
 
 const ANY_WORLD = new World(new HexMap(), new Borders());
 
@@ -54,6 +56,45 @@ describe("A Farm generates 1 food per turn on its Hex", () => {
   });
 });
 
-describe("An Hex with food but no city to deliver it to keep its food for the turn", () => {});
+describe("An Hex with food can deliver its food to its nearest City", () => {
+  test("An Hex with food but no city to deliver to keep its food for the turn", () => {
+    const world = deserialize("(0, 0)\n0 0 0");
+    const hexField = world.map.get(HexCoordinate.ZERO);
+    assert(hexField instanceof HexField);
+    hexField.food2 = 3;
 
-describe("An Hex with food deliver its food to its nearest City", () => {});
+    world.advanceToNextTurn();
+
+    expect(hexField.food2).toEqual(3);
+  });
+
+  test("When the food is right next to the city, then the city receives it the next turn", () => {
+    const world = deserialize("(0, 0)\n0 c");
+    const foodOrigin = world.map.get(HexCoordinate.ZERO);
+    assert(foodOrigin instanceof HexField);
+    const city = world.map.get(HexCoordinate.pointyDirection("3h"));
+    assert(city instanceof HexCity);
+
+    foodOrigin.food2 = 3;
+    city.food2 = 0;
+    world.advanceToNextTurn();
+
+    expect(foodOrigin.food2).toEqual(0);
+    expect(city.food2).toEqual(3);
+  });
+
+  test("When the food is exactly 3 tiles away from a city, then the city receives it the next turn", () => {
+    const world = deserialize("(0, 0)\n0 0 0 c");
+    const foodOrigin = world.map.get(HexCoordinate.ZERO);
+    assert(foodOrigin instanceof HexField);
+    const city = world.map.get(HexCoordinate.pointyDirection("3h").scale(3));
+    assert(city instanceof HexCity);
+
+    foodOrigin.food2 = 3;
+    city.food2 = 0;
+    world.advanceToNextTurn();
+
+    expect(foodOrigin.food2).toEqual(0);
+    expect(city.food2).toEqual(3);
+  });
+});

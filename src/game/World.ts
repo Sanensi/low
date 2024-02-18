@@ -46,6 +46,20 @@ export class World implements Iterable<Hex>, ReadonlyWorld {
   advanceToNextTurn() {
     this.applyPlannedMovements();
     this.map.values().forEach((hex) => hex.advanceToNextTurn());
+
+    const cities = this.map
+      .values()
+      .filter((hex): hex is HexCity => hex instanceof HexCity);
+    const otherHex = this.map
+      .values()
+      .filter((hex) => !(hex instanceof HexCity));
+
+    const foodNotInCities = otherHex.reduce((sum, hex) => sum + hex.food2, 0);
+    if (cities.length === 1) {
+      cities[0].food2 += foodNotInCities;
+      otherHex.forEach((hex) => (hex.food2 = 0));
+    }
+
     this._selectedUnit = undefined;
     this._reachableHexes = undefined;
   }
