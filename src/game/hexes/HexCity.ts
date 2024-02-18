@@ -24,6 +24,8 @@ export class HexCity extends Hex {
   private associatedCities = new Set<HexCity>();
   private readonly borders: Borders;
 
+  readonly foodCapacity = 25;
+
   private get size() {
     return 1 + this.initialCity.associatedCities.size;
   }

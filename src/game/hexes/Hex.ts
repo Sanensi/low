@@ -4,6 +4,7 @@ import { Unit } from "../Unit";
 
 export abstract class Hex implements Traversable {
   readonly isTraversable: boolean = true;
+  readonly foodCapacity: number = 5;
 
   protected _unit?: Unit;
   get unit() {
