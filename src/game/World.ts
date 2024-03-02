@@ -5,6 +5,7 @@ import { Borders } from "./Borders";
 import { Hex, HexFarm, HexField } from "./hexes/Hex";
 import { HexCity, HexSettlement } from "./hexes/HexCity";
 import { findReachableHex, findShortestPath } from "./HexPaths";
+import { moveFood } from "./Resources";
 import { Unit, Villager } from "./Unit";
 
 export interface ReadonlyWorld {
@@ -47,18 +48,7 @@ export class World implements Iterable<Hex>, ReadonlyWorld {
     this.applyPlannedMovements();
     this.map.values().forEach((hex) => hex.advanceToNextTurn());
 
-    const cities = this.map
-      .values()
-      .filter((hex): hex is HexCity => hex instanceof HexCity);
-    const otherHex = this.map
-      .values()
-      .filter((hex) => !(hex instanceof HexCity));
-
-    const foodNotInCities = otherHex.reduce((sum, hex) => sum + hex.food2, 0);
-    if (cities.length === 1) {
-      cities[0].food2 += foodNotInCities;
-      otherHex.forEach((hex) => (hex.food2 = 0));
-    }
+    moveFood(this.map);
 
     this._selectedUnit = undefined;
     this._reachableHexes = undefined;
