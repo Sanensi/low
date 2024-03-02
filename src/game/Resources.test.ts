@@ -98,7 +98,7 @@ describe("An Hex with food can deliver its food to its nearest City", () => {
     expect(city.food2).toEqual(3);
   });
 
-  test.skip("When the food is more than 3 tiles away from a city, then the food move up to 3 hexes per turn before reaching the city", () => {
+  test("When the food is more than 3 tiles away from a city, then the food move up to 3 hexes per turn before reaching the city", () => {
     const world = deserialize("(0, 0)\n0 0 0 0 0 0 c");
     const foodOrigin = world.map.get(HexCoordinate.ZERO);
     const middleHex = world.map.get(
