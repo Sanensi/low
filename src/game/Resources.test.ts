@@ -71,8 +71,8 @@ describe("An Hex with food can deliver its food to its nearest City", () => {
   test("When the food is right next to the city, then the city receives it the next turn", () => {
     const world = deserialize("(0, 0)\n0 c");
     const foodOrigin = world.map.get(HexCoordinate.ZERO);
-    assert(foodOrigin instanceof HexField);
     const city = world.map.get(HexCoordinate.pointyDirection("3h"));
+    assert(foodOrigin instanceof HexField);
     assert(city instanceof HexCity);
 
     foodOrigin.food2 = 3;
@@ -86,8 +86,8 @@ describe("An Hex with food can deliver its food to its nearest City", () => {
   test("When the food is exactly 3 tiles away from a city, then the city receives it the next turn", () => {
     const world = deserialize("(0, 0)\n0 0 0 c");
     const foodOrigin = world.map.get(HexCoordinate.ZERO);
-    assert(foodOrigin instanceof HexField);
     const city = world.map.get(HexCoordinate.pointyDirection("3h").scale(3));
+    assert(foodOrigin instanceof HexField);
     assert(city instanceof HexCity);
 
     foodOrigin.food2 = 3;
@@ -95,6 +95,30 @@ describe("An Hex with food can deliver its food to its nearest City", () => {
     world.advanceToNextTurn();
 
     expect(foodOrigin.food2).toEqual(0);
+    expect(city.food2).toEqual(3);
+  });
+
+  test.skip("When the food is more than 3 tiles away from a city, then the food move up to 3 hexes per turn before reaching the city", () => {
+    const world = deserialize("(0, 0)\n0 0 0 0 0 0 c");
+    const foodOrigin = world.map.get(HexCoordinate.ZERO);
+    const middleHex = world.map.get(
+      HexCoordinate.pointyDirection("3h").scale(3),
+    );
+    const city = world.map.get(HexCoordinate.pointyDirection("3h").scale(6));
+    assert(foodOrigin instanceof HexField);
+    assert(middleHex instanceof HexField);
+    assert(city instanceof HexCity);
+    foodOrigin.food2 = 3;
+    city.food2 = 0;
+
+    world.advanceToNextTurn();
+    expect(foodOrigin.food2).toEqual(0);
+    expect(middleHex.food2).toEqual(3);
+    expect(city.food2).toEqual(0);
+
+    world.advanceToNextTurn();
+    expect(foodOrigin.food2).toEqual(0);
+    expect(middleHex.food2).toEqual(0);
     expect(city.food2).toEqual(3);
   });
 });
