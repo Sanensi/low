@@ -2,6 +2,7 @@ import { assert, throwError } from "../lib/Assertion";
 import { Comparer, Heap } from "../lib/Heap";
 import { HexCoordinate } from "../lib/hex/HexCoordinate";
 import { HexMap, ReadonlyHexMap } from "../lib/hex/HexMap";
+import { HexSet } from "../lib/hex/HexSet";
 
 export interface Traversable {
   readonly isTraversable: boolean;
@@ -95,4 +96,44 @@ export function findShortestPath(
     breadCrumbs,
     stepToReach,
   };
+}
+
+export function findNearestHexes<T extends Traversable, H extends T>(
+  origin: HexCoordinate,
+  map: ReadonlyHexMap<T>,
+  predicate: (hex: T | undefined) => hex is H,
+) {
+  const visited = new HexSet([origin]);
+  const fringes = [[origin]];
+  const nearestHexes: H[] = [];
+
+  for (
+    let step = 1, previousVisistedCount = 0;
+    previousVisistedCount !== visited.size && nearestHexes.length === 0;
+    step++
+  ) {
+    previousVisistedCount = visited.size;
+    fringes.push([]);
+
+    for (const coord of fringes[step - 1]) {
+      for (const neighborCoord of coord.neighbors()) {
+        const neighborHex = map.get(neighborCoord);
+
+        if (
+          neighborHex &&
+          neighborHex.isTraversable &&
+          !visited.has(neighborCoord)
+        ) {
+          visited.add(neighborCoord);
+          fringes[step].push(neighborCoord);
+
+          if (predicate(neighborHex)) {
+            nearestHexes.push(neighborHex);
+          }
+        }
+      }
+    }
+  }
+
+  return nearestHexes;
 }

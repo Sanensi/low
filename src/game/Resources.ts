@@ -1,6 +1,6 @@
 import { throwError } from "../lib/Assertion";
 import { ReadonlyHexMap } from "../lib/hex/HexMap";
-import { findShortestPath } from "./HexPaths";
+import { findNearestHexes, findShortestPath } from "./HexPaths";
 import { Hex } from "./hexes/Hex";
 import { HexCity } from "./hexes/HexCity";
 
@@ -16,12 +16,14 @@ export function moveFood(map: ReadonlyHexMap<Hex>) {
 }
 
 function moveFoodTowardNearestCity(hexWithFood: Hex, map: ReadonlyHexMap<Hex>) {
-  const cities = map
-    .values()
-    .filter((hex): hex is HexCity => hex instanceof HexCity);
+  const nearestCities = findNearestHexes(
+    hexWithFood.position,
+    map,
+    (hex): hex is HexCity => hex instanceof HexCity,
+  );
 
-  if (cities.length === 1) {
-    const [city] = cities;
+  if (nearestCities.length > 0) {
+    const [city] = nearestCities;
     const { shortestPath } = findShortestPath(
       hexWithFood.position,
       city.position,
