@@ -57,7 +57,7 @@ describe("A Farm generates 1 food per turn on its Hex", () => {
 });
 
 describe("An Hex with food can deliver its food to its nearest City", () => {
-  test("When an Hex has food but no city to deliver to, then keep its food for the turn", () => {
+  test("When an Hex has food but no city to deliver to, then it keep its food for the turn", () => {
     const world = deserialize("(0, 0)\n0 0 0");
     const hexField = world.map.get(HexCoordinate.ZERO);
     assert(hexField instanceof HexField);
@@ -120,6 +120,24 @@ describe("An Hex with food can deliver its food to its nearest City", () => {
     expect(foodOrigin.food2).toEqual(0);
     expect(middleHex.food2).toEqual(0);
     expect(city.food2).toEqual(3);
+  });
+
+  test("When there is a trail of food leading to a city, then that city receives only the food within 3 tiles from it", () => {
+    const world = deserialize("(0, 0)\n0 0 0 0 c");
+    const city = world.map.get(HexCoordinate.pointyDirection("3h").scale(4));
+    assert(city instanceof HexCity);
+    world.map
+      .values()
+      .filter((hex): hex is HexField => hex instanceof HexField)
+      .forEach((hex) => (hex.food2 = 1));
+
+    world.advanceToNextTurn();
+
+    expect(city.food2).toEqual(3);
+
+    world.advanceToNextTurn();
+
+    expect(city.food2).toEqual(4);
   });
 
   test("When there is 2 cities in range of some food, then the food moves to the nearest city", () => {
