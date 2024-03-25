@@ -20,8 +20,11 @@ export function moveFood(map: ReadonlyHexMap<Hex>) {
 
   nonCityHexWithFood
     .map((hex) => calculateFoodTransaction(hex, map))
-    .filter((transaction): transaction is FoodTransaction => !!transaction)
-    .forEach(applyFoodTransaction);
+    .forEach((transaction) => {
+      if (transaction) {
+        applyFoodTransaction(transaction);
+      }
+    });
 }
 
 function calculateFoodTransaction(
