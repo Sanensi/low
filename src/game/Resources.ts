@@ -38,10 +38,12 @@ function calculateFoodTransaction(
   );
 
   if (nearestCities.length > 0) {
-    const [city] = nearestCities;
+    const cityWithLeastFood = nearestCities.toSorted(
+      (cityA, cityB) => cityA.food2 - cityB.food2,
+    )[0];
     const { shortestPath } = findShortestPath(
       foodProvider.position,
-      city.position,
+      cityWithLeastFood.position,
       map,
     );
     const clampedPath = shortestPath.slice(0, FOOD_MOVEMENT + 1);

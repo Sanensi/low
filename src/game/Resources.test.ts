@@ -140,7 +140,7 @@ describe("An Hex with food can deliver its food to its nearest City", () => {
     expect(city.food2).toEqual(4);
   });
 
-  test("When there is 2 cities in range of some food, then the food moves to the nearest city", () => {
+  test("When there are 2 cities in range of some food, then the food moves to the nearest city", () => {
     const world = deserialize("(-4, 0)\nc 0 0 c");
     const foodOrigin = world.map.get(HexCoordinate.ZERO);
     const city1 = world.map.get(HexCoordinate.pointyDirection("3h").scale(1));
@@ -157,5 +157,24 @@ describe("An Hex with food can deliver its food to its nearest City", () => {
     expect(foodOrigin.food2).toEqual(0);
     expect(city1.food2).toEqual(3);
     expect(city2.food2).toEqual(0);
+  });
+
+  test("When there are 2 cities at the same distance of one food, then the food moves to the city with the least food", () => {
+    const world = deserialize("(-4, 0)\nc 0 0 0 c");
+    const foodOrigin = world.map.get(HexCoordinate.ZERO);
+    const city1 = world.map.get(HexCoordinate.pointyDirection("3h").scale(2));
+    const city2 = world.map.get(HexCoordinate.pointyDirection("9h").scale(2));
+    assert(foodOrigin instanceof HexField);
+    assert(city1 instanceof HexCity);
+    assert(city2 instanceof HexCity);
+    foodOrigin.food2 = 1;
+    city1.food2 = 1;
+    city2.food2 = 0;
+
+    world.advanceToNextTurn();
+
+    expect(foodOrigin.food2).toEqual(0);
+    expect(city1.food2).toEqual(1);
+    expect(city2.food2).toEqual(1);
   });
 });
